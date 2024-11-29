@@ -6,29 +6,29 @@ NOT READY FOR PRODUCTION YET!
 
 Code Example:
 ```go
-	//Build elements tree, <html> as root element
-	html := dhtml.Tag("html").
-		//appending children elements
-		Append(
-			dhtml.Tag("head").
-				Append(
-					//element with attributes
-					dhtml.Tag("link").Attribute("href", "/assets/vendor/bootstrap.min.css").Attribute("rel", "stylesheet"),
-				),
-		).
-		//body element
-		Append(dhtml.Tag("body").
-			Append(
-				// dhtml.Div() is an alias for dhtml.Tag("div")
-				dhtml.Div().Id("test").
-					Attribute("data-mt-test", "some attribute").
-					Class("border").Class("m-3").Class("p-3"). //css classes handling
-					Content("some text"),
-			),
-		)
+//Build elements tree, <html> as root element
+html := dhtml.Tag("html").
+  //appending children elements
+  Append(
+    dhtml.Tag("head").
+      Append(
+        //element with attributes
+        dhtml.Tag("link").Attribute("href", "/assets/vendor/bootstrap.min.css").Attribute("rel", "stylesheet"),
+      ),
+  ).
+  //body element
+  Append(dhtml.Tag("body").
+    Append(
+      // dhtml.Div() is an alias for dhtml.Tag("div")
+      dhtml.Div().Id("test").
+        Attribute("data-mt-test", "some attribute").
+        Class("border").Class("m-3").Class("p-3"). //css classes handling
+        Content("some text"),
+    ),
+  )
 
-	//return it as HTML string
-	return html.Render()
+//return it as HTML string
+return html.Render()
 ```
 
 And yes, one more time: **Thank you, Drupal!**
