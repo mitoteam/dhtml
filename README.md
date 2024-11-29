@@ -20,11 +20,18 @@ html := dhtml.Tag("html").
   //body element
   Append(dhtml.Tag("body").
     Append(
-      // dhtml.Div() is an alias for dhtml.Tag("div")
+      // dhtml.Div() is a shorthand for dhtml.Tag("div")
       dhtml.Div().Id("test").
         Attribute("data-mt-test", "some attribute").
-        Class("border").Class("m-3").Class("p-3"). //css classes handling
+        //classes deduplication
+        Class("border").Class("m-3").Class("p-3").
         Content("some <escaped> text"),
+    ),
+    Append(
+      dhtml.Div()
+        //multiple classes
+        Classes([]string{"border", "border-danger", "border-5"}).
+        Content("another text in red rectangle"),
     ),
   )
 

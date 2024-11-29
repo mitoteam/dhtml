@@ -62,8 +62,17 @@ func (e *Element) GetAttribute(name string) string {
 	return e.attributes[name]
 }
 
-func (e *Element) Class(name string) *Element {
-	e.classes = append(e.classes, SafeClassName(name))
+func (e *Element) Class(class_name string) *Element {
+	e.classes = append(e.classes, SafeClassName(class_name))
+	return e
+}
+
+func (e *Element) Classes(classes []string) *Element {
+	for _, class_name := range classes {
+		SafeClassName(class_name)
+	}
+
+	e.classes = append(e.classes, classes...)
 	return e
 }
 
