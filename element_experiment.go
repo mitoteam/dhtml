@@ -27,6 +27,11 @@ func BuildExperimentHtml() *Element {
 					Span().Content("red").Classes([]string{"border", "border-danger", "border-5"}),
 				).
 				Content("content"),
+		).
+		Append(
+			Div().Classes([]string{"border", "p-3", "m-3"}).
+				Content("content").
+				Content("only"),
 		)
 
 	html := Tag("html").
