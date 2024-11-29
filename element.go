@@ -1,6 +1,7 @@
 package dhtml
 
 import (
+	"html"
 	"strings"
 
 	"github.com/mitoteam/mttools"
@@ -18,7 +19,7 @@ type Element struct {
 
 func Tag(tag string) *Element {
 	r := &Element{
-		tag: tag,
+		tag: SafeTagName(tag),
 
 		attributes: make(map[string]string),
 		classes:    make([]string, 0),
@@ -46,7 +47,7 @@ func (e *Element) Render() string {
 
 	//render attributes
 	for name, value := range e.attributes {
-		sb.WriteString(" " + name + "=\"" + value + "\"")
+		sb.WriteString(" " + name + "=\"" + html.EscapeString(value) + "\"")
 	}
 
 	if len(e.children) == 0 && len(e.content) == 0 {
@@ -55,7 +56,7 @@ func (e *Element) Render() string {
 	} else {
 		sb.WriteString(">")
 
-		sb.WriteString(e.content)
+		sb.WriteString(html.EscapeString(e.content))
 
 		//go deeper (recursion)
 		for _, child := range e.children {
@@ -69,8 +70,15 @@ func (e *Element) Render() string {
 	return sb.String()
 }
 
+// Adds child element
 func (e *Element) Append(child_element *Element) *Element {
 	e.children = append(e.children, child_element)
+	return e
+}
+
+// Adds child element to the beginning of children list
+func (e *Element) Prepend(child_element *Element) *Element {
+	e.children = append([]*Element{child_element}, e.children...)
 	return e
 }
 
@@ -85,7 +93,7 @@ func (e *Element) Id(id string) *Element {
 }
 
 func (e *Element) Attribute(name, value string) *Element {
-	e.attributes[name] = value
+	e.attributes[SafeAttributeName(name)] = html.EscapeString(value)
 	return e
 }
 
@@ -94,6 +102,6 @@ func (e *Element) GetAttribute(name string) string {
 }
 
 func (e *Element) Class(name string) *Element {
-	e.classes = append(e.classes, name)
+	e.classes = append(e.classes, SafeClassName(name))
 	return e
 }
