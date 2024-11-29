@@ -14,10 +14,11 @@ func BuildExperimentHtml() *Element {
 		Id("test").
 		Attribute("data-mt-test", "some attribute").
 		Class("border").Class("m-3").Class("p-3").Class("border").
-		Content("some text")
+		Content("some <escaped> text")
 	body.Append(div)
 
 	html := Tag("html").
+		Comment("some <escaped> comment").
 		Append(head).
 		Append(body)
 

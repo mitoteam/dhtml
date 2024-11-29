@@ -8,6 +8,7 @@ Code Example:
 ```go
 //Build elements tree, <html> as root element
 html := dhtml.Tag("html").
+  Comment("some <html> escaped comment").
   //appending children elements
   Append(
     dhtml.Tag("head").
@@ -23,7 +24,7 @@ html := dhtml.Tag("html").
       dhtml.Div().Id("test").
         Attribute("data-mt-test", "some attribute").
         Class("border").Class("m-3").Class("p-3"). //css classes handling
-        Content("some text"),
+        Content("some <escaped> text"),
     ),
   )
 

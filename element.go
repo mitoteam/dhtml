@@ -7,6 +7,9 @@ import (
 	"github.com/mitoteam/mttools"
 )
 
+// fake tag name to add html comments
+const commentTagName = "!--"
+
 type Element struct {
 	tag     string
 	id      string
@@ -31,6 +34,10 @@ func Tag(tag string) *Element {
 }
 
 func (e *Element) Render() string {
+	if e.tag == commentTagName {
+		return "<!--" + html.EscapeString(e.content) + "-->"
+	}
+
 	//check and set attributes
 	if e.id != "" {
 		e.attributes["id"] = e.id
@@ -104,4 +111,14 @@ func (e *Element) GetAttribute(name string) string {
 func (e *Element) Class(name string) *Element {
 	e.classes = append(e.classes, SafeClassName(name))
 	return e
+}
+
+// Adds html comment as a child to the element
+func (e *Element) Comment(content string) *Element {
+	r := &Element{
+		tag:     commentTagName,
+		content: content,
+	}
+
+	return e.Append(r)
 }
