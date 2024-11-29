@@ -2,22 +2,25 @@ package dhtml
 
 import (
 	"html"
-	"strings"
-
-	"github.com/mitoteam/mttools"
 )
 
-// fake tag name to add html comments
-const commentTagName = "!--"
+const (
+	tagKindNormal = iota
+	tagKindComment
+	tagKindContent
+)
 
 type Element struct {
-	tag     string
-	id      string
-	content string
-
+	kind       int // tag kind
+	tag        string
 	attributes map[string]string
-	classes    []string
-	children   []*Element
+
+	id      string
+	classes []string
+
+	children []*Element
+
+	content string //comments and raw content
 }
 
 func Tag(tag string) *Element {
@@ -33,50 +36,6 @@ func Tag(tag string) *Element {
 	return r
 }
 
-func (e *Element) Render() string {
-	if e.tag == commentTagName {
-		return "<!--" + html.EscapeString(e.content) + "-->"
-	}
-
-	//check and set attributes
-	if e.id != "" {
-		e.attributes["id"] = e.id
-	}
-
-	//CSS classes
-	if len(e.classes) > 0 {
-		e.attributes["class"] = strings.Join(mttools.UniqueSlice(e.classes), " ")
-	}
-
-	//prepare raw HTML output
-	var sb strings.Builder
-	sb.WriteString("<" + e.tag)
-
-	//render attributes
-	for name, value := range e.attributes {
-		sb.WriteString(" " + name + "=\"" + html.EscapeString(value) + "\"")
-	}
-
-	if len(e.children) == 0 && len(e.content) == 0 {
-		//self closing tag
-		sb.WriteString("/>")
-	} else {
-		sb.WriteString(">")
-
-		sb.WriteString(html.EscapeString(e.content))
-
-		//go deeper (recursion)
-		for _, child := range e.children {
-			sb.WriteString(child.Render())
-		}
-
-		//closing tag
-		sb.WriteString("</" + e.tag + ">")
-	}
-
-	return sb.String()
-}
-
 // Adds child element
 func (e *Element) Append(child_element *Element) *Element {
 	e.children = append(e.children, child_element)
@@ -86,11 +45,6 @@ func (e *Element) Append(child_element *Element) *Element {
 // Adds child element to the beginning of children list
 func (e *Element) Prepend(child_element *Element) *Element {
 	e.children = append([]*Element{child_element}, e.children...)
-	return e
-}
-
-func (e *Element) Content(content string) *Element {
-	e.content = content
 	return e
 }
 
@@ -113,12 +67,29 @@ func (e *Element) Class(name string) *Element {
 	return e
 }
 
-// Adds html comment as a child to the element
-func (e *Element) Comment(content string) *Element {
+func (e *Element) Content(content string) *Element {
 	r := &Element{
-		tag:     commentTagName,
+		kind:    tagKindContent,
 		content: content,
 	}
 
 	return e.Append(r)
+}
+
+func (e *Element) IsContent() bool {
+	return e.kind == tagKindContent
+}
+
+// Adds html comment as a child to the element
+func (e *Element) Comment(content string) *Element {
+	r := &Element{
+		kind:    tagKindComment,
+		content: content,
+	}
+
+	return e.Append(r)
+}
+
+func (e *Element) IsComment() bool {
+	return e.kind == tagKindComment
 }
