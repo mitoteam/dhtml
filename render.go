@@ -54,13 +54,20 @@ func (e *Element) rawRender(level int) string {
 		sb.WriteString(">")
 
 		//go deeper (recursion)
+		var previousElement *Element
 		for _, child := range e.children {
 			child_level := level + 1
 			if e.isInline() {
 				child_level = 0
 			}
 
+			//separate two consecutive content elements with space
+			if previousElement != nil && child.kind == tagKindContent && previousElement.kind == tagKindContent {
+				sb.WriteString(" ")
+			}
+
 			sb.WriteString(child.rawRender(child_level))
+			previousElement = child
 		}
 
 		//closing tag
@@ -115,7 +122,7 @@ func (e *Element) isInline() bool {
 
 	//has no not inline children
 	for _, child := range e.children {
-		if !child.isInline() || !slices.Contains(inline_preferred_tags, e.tag) {
+		if !child.isInline() || (child.kind == tagKindNormal && !slices.Contains(inline_preferred_tags, child.tag)) {
 			return false
 		}
 	}
