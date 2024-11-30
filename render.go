@@ -6,6 +6,7 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/elliotchance/orderedmap/v2"
 	"github.com/mitoteam/mttools"
 )
 
@@ -75,25 +76,27 @@ func (e *Element) rawRender(level int) string {
 
 // check, set and render attributes
 func (e *Element) renderAttributes(sb *strings.Builder) {
-	attributes := make(map[string]string)
+	attributes := orderedmap.NewOrderedMap[string, string]()
 
 	//check and set attributes
 	if e.id != "" {
-		attributes["id"] = e.id
+		attributes.Set("id", e.id)
 		delete(e.attributes, "id") //prefer e.id over direct attributes
 	}
 
 	//CSS classes
 	if len(e.classes) > 0 {
-		attributes["class"] = strings.Join(mttools.UniqueSlice(e.classes), " ")
+		attributes.Set("class", strings.Join(mttools.UniqueSlice(e.classes), " "))
 		delete(e.attributes, "class") //prefer e.class over direct attributes
 	}
 
-	//other attributes
-	maps.Copy(attributes, e.attributes)
+	//other attributes in alphabetical order
+	for _, name := range slices.Sorted(maps.Keys(e.attributes)) {
+		attributes.Set(name, e.attributes[name])
+	}
 
 	//render attributes
-	for name, value := range attributes {
+	for name, value := range attributes.Iterator() {
 		value = strings.TrimSpace(value)
 
 		sb.WriteString(" " + strings.TrimSpace(name))
@@ -112,10 +115,10 @@ func (e *Element) isInline() bool {
 
 	//has no not inline children
 	for _, child := range e.children {
-		if !child.isInline() {
+		if !child.isInline() || !slices.Contains(inline_preferred_tags, e.tag) {
 			return false
 		}
 	}
 
-	return slices.Contains(inline_preferred_tags, e.tag)
+	return true
 }
