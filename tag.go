@@ -2,6 +2,7 @@ package dhtml
 
 import (
 	"html"
+	"log"
 	"maps"
 	"slices"
 	"strings"
@@ -16,9 +17,16 @@ const (
 	tagKindContent
 )
 
-var inline_preferred_tags = []string{
-	"i", "b", "span",
-}
+var (
+	inline_preferred_tags = []string{
+		"i", "b", "span",
+	}
+
+	//https://html.spec.whatwg.org/multipage/syntax.html#void-elements
+	void_tags = []string{
+		"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source", "track", "wbr",
+	}
+)
 
 type (
 	// Basic tag element implementation
@@ -53,9 +61,9 @@ func NewTag(tag string) *Tag {
 	return r
 }
 
-func (e *Tag) GetTags() []*Tag {
+func (t *Tag) GetTags() TagsList {
 	//tag is a list of itself
-	return []*Tag{e}
+	return TagsList{t}
 }
 
 // Adds child element
@@ -170,13 +178,11 @@ func (t *Tag) renderTag(level int, sb *strings.Builder) {
 
 	if t.IsComment() {
 		sb.WriteString("<!--" + html.EscapeString(t.content) + "-->")
-
 		return
 	}
 
 	if t.IsContent() {
 		sb.WriteString(html.EscapeString(t.content))
-
 		return
 	}
 
@@ -185,9 +191,13 @@ func (t *Tag) renderTag(level int, sb *strings.Builder) {
 
 	t.renderAttributes(sb)
 
-	if len(t.children) == 0 && len(t.content) == 0 {
-		//self closing tag
-		sb.WriteString("/>")
+	if slices.Contains(void_tags, t.tag) {
+		// void tag
+		if len(t.children) == 0 {
+			sb.WriteString("/>")
+		} else {
+			log.Fatalf("Void tag <%s> can not have children", t.tag)
+		}
 	} else {
 		sb.WriteString(">")
 

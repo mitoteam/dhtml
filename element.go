@@ -2,8 +2,10 @@ package dhtml
 
 type (
 	ElementI interface {
-		GetTags() []*Tag
+		GetTags() TagsList
 	}
 
+	// helper type
 	ElementsList []ElementI
+	TagsList     []*Tag
 )
