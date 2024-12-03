@@ -44,7 +44,7 @@ type (
 	}
 )
 
-// forcing interface implementation
+// force interface implementation
 var _ ElementI = &Tag{}
 
 // Tag constructor
@@ -67,9 +67,9 @@ func (t *Tag) GetTags() TagsList {
 }
 
 // Adds child element
-func (e *Tag) Append(child_element ElementI) *Tag {
-	e.children = append(e.children, child_element)
-	return e
+func (t *Tag) Append(child_element ElementI) *Tag {
+	t.children = append(t.children, child_element)
+	return t
 }
 
 // Adds child element to the beginning of children list
