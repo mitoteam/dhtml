@@ -14,7 +14,7 @@ import (
 const (
 	tagKindNormal = iota
 	tagKindComment
-	tagKindContent
+	tagKindText
 )
 
 var (
@@ -40,7 +40,7 @@ type (
 
 		children ElementsList
 
-		content string //comments and raw content
+		text string //comments and raw text content
 	}
 )
 
@@ -67,14 +67,20 @@ func (t *Tag) GetTags() TagsList {
 }
 
 // Adds child element
-func (t *Tag) Append(child_element ElementI) *Tag {
-	t.children = append(t.children, child_element)
+func (t *Tag) Append(element ElementI) *Tag {
+	t.children = append(t.children, element)
+	return t
+}
+
+// Adds child element
+func (t *Tag) AppendList(list ElementsList) *Tag {
+	t.children = append(t.children, list...)
 	return t
 }
 
 // Adds child element to the beginning of children list
-func (e *Tag) Prepend(child_element ElementI) *Tag {
-	e.children = append(ElementsList{child_element}, e.children...)
+func (e *Tag) Prepend(element ElementI) *Tag {
+	e.children = append(ElementsList{element}, e.children...)
 	return e
 }
 
@@ -106,24 +112,24 @@ func (e *Tag) Classes(classes []string) *Tag {
 	return e
 }
 
-func (e *Tag) Content(content string) *Tag {
+func (e *Tag) Text(content string) *Tag {
 	r := &Tag{
-		kind:    tagKindContent,
-		content: content,
+		kind: tagKindText,
+		text: content,
 	}
 
 	return e.Append(r)
 }
 
-func (e *Tag) IsContent() bool {
-	return e.kind == tagKindContent
+func (e *Tag) IsText() bool {
+	return e.kind == tagKindText
 }
 
 // Adds html comment as a child to the element
 func (e *Tag) Comment(content string) *Tag {
 	r := &Tag{
-		kind:    tagKindComment,
-		content: content,
+		kind: tagKindComment,
+		text: content,
 	}
 
 	return e.Append(r)
@@ -136,7 +142,7 @@ func (e *Tag) IsComment() bool {
 // true if this tag could be rendered inline, false - should be rendered on new line and indented.
 func (t *Tag) IsInline() bool {
 	//content has no children so considered inline
-	if t.kind == tagKindContent {
+	if t.kind == tagKindText {
 		return true
 	}
 
@@ -177,12 +183,12 @@ func (t *Tag) renderTag(level int, sb *strings.Builder) {
 	sb.WriteString(indent)
 
 	if t.IsComment() {
-		sb.WriteString("<!--" + html.EscapeString(t.content) + "-->")
+		sb.WriteString("<!--" + html.EscapeString(t.text) + "-->")
 		return
 	}
 
-	if t.IsContent() {
-		sb.WriteString(html.EscapeString(t.content))
+	if t.IsText() {
+		sb.WriteString(html.EscapeString(t.text))
 		return
 	}
 
@@ -213,13 +219,13 @@ func (t *Tag) renderTag(level int, sb *strings.Builder) {
 				}
 
 				//separate two consecutive content elements with space
-				if previousIsContent && child_tag.kind == tagKindContent {
+				if previousIsContent && child_tag.kind == tagKindText {
 					sb.WriteString(" ")
 				}
 
 				child_tag.renderTag(child_level, sb)
 
-				previousIsContent = child_tag.kind == tagKindContent
+				previousIsContent = child_tag.kind == tagKindText
 			}
 		}
 
