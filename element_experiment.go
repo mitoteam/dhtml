@@ -1,14 +1,14 @@
 package dhtml
 
-func BuildExperimentHtml() *Element {
-	head := Tag("head").
+func BuildExperimentHtml() *Tag {
+	head := NewTag("head").
 		Append(
-			Tag("link").
+			NewTag("link").
 				Attribute("href", "/assets/vendor/bootstrap.min.css").
 				Attribute("rel", "stylesheet"),
 		)
 
-	body := Tag("body")
+	body := NewTag("body")
 
 	div := Div().
 		Id("test").
@@ -34,7 +34,7 @@ func BuildExperimentHtml() *Element {
 				Content("only"),
 		)
 
-	html := Tag("html").
+	html := NewTag("html").
 		Comment("some <escaped> comment").
 		Append(head).
 		Append(body)

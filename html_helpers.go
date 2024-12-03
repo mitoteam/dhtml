@@ -1,9 +1,9 @@
 package dhtml
 
-func Div() *Element {
-	return Tag("div")
+func Div() *Tag {
+	return NewTag("div")
 }
 
-func Span() *Element {
-	return Tag("span")
+func Span() *Tag {
+	return NewTag("span")
 }

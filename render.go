@@ -15,37 +15,42 @@ var inline_preferred_tags = []string{
 }
 
 // Renders element with all the children to HTML
-func (e *Element) Render() string {
-	return e.rawRender(0)
+func (e *Tag) Render() string {
+	var sb strings.Builder
+
+	for _, tag := range e.GetTags() {
+		tag.renderTag(0, &sb)
+	}
+
+	return sb.String()
 }
 
 // does real job (with recursion)
-func (e *Element) rawRender(level int) string {
+func (e *Tag) renderTag(level int, sb *strings.Builder) {
 	var indent string
 
 	if level > 0 {
 		indent = "\n" + strings.Repeat("  ", level)
 	}
 
-	var sb strings.Builder
 	sb.WriteString(indent)
 
 	if e.IsComment() {
 		sb.WriteString("<!--" + html.EscapeString(e.content) + "-->")
 
-		return sb.String()
+		return
 	}
 
 	if e.IsContent() {
 		sb.WriteString(html.EscapeString(e.content))
 
-		return sb.String()
+		return
 	}
 
 	//prepare raw HTML output
 	sb.WriteString("<" + e.tag)
 
-	e.renderAttributes(&sb)
+	e.renderAttributes(sb)
 
 	if len(e.children) == 0 && len(e.content) == 0 {
 		//self closing tag
@@ -54,10 +59,10 @@ func (e *Element) rawRender(level int) string {
 		sb.WriteString(">")
 
 		//go deeper (recursion)
-		var previousElement *Element
+		var previousElement *Tag
 		for _, child := range e.children {
 			child_level := level + 1
-			if e.isInline() {
+			if e.IsInline() {
 				child_level = 0
 			}
 
@@ -66,23 +71,21 @@ func (e *Element) rawRender(level int) string {
 				sb.WriteString(" ")
 			}
 
-			sb.WriteString(child.rawRender(child_level))
+			child.renderTag(child_level, sb)
 			previousElement = child
 		}
 
 		//closing tag
-		if !e.isInline() {
+		if !e.IsInline() {
 			sb.WriteString(indent)
 		}
 
 		sb.WriteString("</" + e.tag + ">")
 	}
-
-	return sb.String()
 }
 
 // check, set and render attributes
-func (e *Element) renderAttributes(sb *strings.Builder) {
+func (e *Tag) renderAttributes(sb *strings.Builder) {
 	attributes := orderedmap.NewOrderedMap[string, string]()
 
 	//check and set attributes
@@ -114,7 +117,7 @@ func (e *Element) renderAttributes(sb *strings.Builder) {
 	}
 }
 
-func (e *Element) isInline() bool {
+func (e *Tag) IsInline() bool {
 	//content has no children so considered inline
 	if e.kind == tagKindContent {
 		return true
@@ -122,7 +125,7 @@ func (e *Element) isInline() bool {
 
 	//has no not inline children
 	for _, child := range e.children {
-		if !child.isInline() || (child.kind == tagKindNormal && !slices.Contains(inline_preferred_tags, child.tag)) {
+		if !child.IsInline() || (child.kind == tagKindNormal && !slices.Contains(inline_preferred_tags, child.tag)) {
 			return false
 		}
 	}
