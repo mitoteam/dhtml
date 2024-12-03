@@ -7,3 +7,12 @@ func Div() *Tag {
 func Span() *Tag {
 	return NewTag("span")
 }
+
+func Content(content string) *Tag {
+	r := &Tag{
+		kind:    tagKindContent,
+		content: content,
+	}
+
+	return r
+}
