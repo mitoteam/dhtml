@@ -1,26 +1,29 @@
 package dhtml
 
 import (
-	"errors"
+	"fmt"
 	"log"
 	"regexp"
+	"strings"
 )
 
 const (
-	TAG_NAME_REGEXP       = `^(?i)[a-z][a-z0-9\-]{0,255}$`
-	ATTRIBUTE_NAME_REGEXP = `^(?i)[a-z][a-z0-9\-\:]{0,255}$`
-	CLASS_NAME_REGEXP     = `^(?i)\-?[\_a-z][\_\-a-z0-9\-\:]{0,255}$`
+	TAG_NAME_REGEXP       = `^[a-z][a-z0-9\-]{0,255}$`
+	ATTRIBUTE_NAME_REGEXP = `^[a-z][a-z0-9\-\:]{0,255}$`
+	CLASS_NAME_REGEXP     = `^\-?[\_a-z][\_\-a-z0-9\-\:]{0,255}$`
 )
 
 func CheckTagName(name string) error {
 	if !regexp.MustCompile(TAG_NAME_REGEXP).MatchString(name) {
-		return errors.New("Wrong tag name: " + name)
+		return fmt.Errorf("Wrong tag name: <%s>", name)
 	}
 
 	return nil
 }
 
 func SafeTagName(name string) string {
+	name = strings.ToLower(name)
+
 	if err := CheckTagName(name); err != nil {
 		log.Fatalln(err)
 	}
@@ -30,13 +33,15 @@ func SafeTagName(name string) string {
 
 func CheckAttributeName(name string) error {
 	if !regexp.MustCompile(ATTRIBUTE_NAME_REGEXP).MatchString(name) {
-		return errors.New("Wrong attribute name: " + name)
+		return fmt.Errorf("Wrong attribute name '%s'", name)
 	}
 
 	return nil
 }
 
 func SafeAttributeName(name string) string {
+	name = strings.ToLower(name)
+
 	if err := CheckAttributeName(name); err != nil {
 		log.Fatalln(err)
 	}
@@ -46,13 +51,15 @@ func SafeAttributeName(name string) string {
 
 func CheckClassName(name string) error {
 	if !regexp.MustCompile(CLASS_NAME_REGEXP).MatchString(name) {
-		return errors.New("Wrong class name: " + name)
+		return fmt.Errorf("Wrong class name '%s'", name)
 	}
 
 	return nil
 }
 
 func SafeClassName(name string) string {
+	name = strings.ToLower(name)
+
 	if err := CheckClassName(name); err != nil {
 		log.Fatalln(err)
 	}
