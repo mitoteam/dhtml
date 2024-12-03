@@ -2,6 +2,12 @@ package dhtml
 
 import (
 	"html"
+	"maps"
+	"slices"
+	"strings"
+
+	"github.com/elliotchance/orderedmap/v2"
+	"github.com/mitoteam/mttools"
 )
 
 const (
@@ -9,6 +15,10 @@ const (
 	tagKindComment
 	tagKindContent
 )
+
+var inline_preferred_tags = []string{
+	"i", "b", "span",
+}
 
 type (
 	// Basic tag element implementation
@@ -20,7 +30,7 @@ type (
 		id      string
 		classes []string
 
-		children []*Tag
+		children ElementsList
 
 		content string //comments and raw content
 	}
@@ -29,6 +39,7 @@ type (
 // forcing interface implementation
 var _ ElementI = &Tag{}
 
+// Tag constructor
 func NewTag(tag string) *Tag {
 	r := &Tag{
 		tag: SafeTagName(tag),
@@ -36,7 +47,7 @@ func NewTag(tag string) *Tag {
 		attributes: make(map[string]string),
 		classes:    make([]string, 0),
 
-		children: make([]*Tag, 0),
+		children: make(ElementsList, 0),
 	}
 
 	return r
@@ -48,14 +59,14 @@ func (e *Tag) GetTags() []*Tag {
 }
 
 // Adds child element
-func (e *Tag) Append(child_element *Tag) *Tag {
+func (e *Tag) Append(child_element ElementI) *Tag {
 	e.children = append(e.children, child_element)
 	return e
 }
 
 // Adds child element to the beginning of children list
-func (e *Tag) Prepend(child_element *Tag) *Tag {
-	e.children = append([]*Tag{child_element}, e.children...)
+func (e *Tag) Prepend(child_element ElementI) *Tag {
+	e.children = append(ElementsList{child_element}, e.children...)
 	return e
 }
 
@@ -113,3 +124,135 @@ func (e *Tag) Comment(content string) *Tag {
 func (e *Tag) IsComment() bool {
 	return e.kind == tagKindComment
 }
+
+// true if this tag could be rendered inline, false - should be rendered on new line and indented.
+func (t *Tag) IsInline() bool {
+	//content has no children so considered inline
+	if t.kind == tagKindContent {
+		return true
+	}
+
+	//has no not inline children
+	for _, child := range t.children {
+		if tag, ok := child.(*Tag); ok {
+			if !tag.IsInline() || (tag.kind == tagKindNormal && !slices.Contains(inline_preferred_tags, tag.tag)) {
+				return false
+			}
+		} else {
+			return false
+		}
+	}
+
+	return true
+}
+
+// #region Renderer
+// Renders element with all the children as HTML
+func (t *Tag) Render() string {
+	var sb strings.Builder
+
+	for _, tag := range t.GetTags() {
+		tag.renderTag(0, &sb)
+	}
+
+	return sb.String()
+}
+
+// does real job (with recursion)
+func (t *Tag) renderTag(level int, sb *strings.Builder) {
+	var indent string
+
+	if level > 0 {
+		indent = "\n" + strings.Repeat("  ", level)
+	}
+
+	sb.WriteString(indent)
+
+	if t.IsComment() {
+		sb.WriteString("<!--" + html.EscapeString(t.content) + "-->")
+
+		return
+	}
+
+	if t.IsContent() {
+		sb.WriteString(html.EscapeString(t.content))
+
+		return
+	}
+
+	//prepare raw HTML output
+	sb.WriteString("<" + t.tag)
+
+	t.renderAttributes(sb)
+
+	if len(t.children) == 0 && len(t.content) == 0 {
+		//self closing tag
+		sb.WriteString("/>")
+	} else {
+		sb.WriteString(">")
+
+		previousIsContent := false
+
+		//go deeper (recursion)
+		for _, child_element := range t.children {
+			child_level := level + 1
+
+			for _, child_tag := range child_element.GetTags() {
+				if t.IsInline() {
+					child_level = 0
+				}
+
+				//separate two consecutive content elements with space
+				if previousIsContent && child_tag.kind == tagKindContent {
+					sb.WriteString(" ")
+				}
+
+				child_tag.renderTag(child_level, sb)
+
+				previousIsContent = child_tag.kind == tagKindContent
+			}
+		}
+
+		//closing tag
+		if !t.IsInline() {
+			sb.WriteString(indent)
+		}
+
+		sb.WriteString("</" + t.tag + ">")
+	}
+}
+
+// check, set and render attributes
+func (t *Tag) renderAttributes(sb *strings.Builder) {
+	attributes := orderedmap.NewOrderedMap[string, string]()
+
+	//check and set attributes
+	if t.id != "" {
+		attributes.Set("id", t.id)
+		delete(t.attributes, "id") //prefer e.id over direct attributes
+	}
+
+	//CSS classes
+	if len(t.classes) > 0 {
+		attributes.Set("class", strings.Join(mttools.UniqueSlice(t.classes), " "))
+		delete(t.attributes, "class") //prefer e.class over direct attributes
+	}
+
+	//other attributes in alphabetical order
+	for _, name := range slices.Sorted(maps.Keys(t.attributes)) {
+		attributes.Set(name, t.attributes[name])
+	}
+
+	//render attributes
+	for name, value := range attributes.Iterator() {
+		value = strings.TrimSpace(value)
+
+		sb.WriteString(" " + strings.TrimSpace(name))
+
+		if len(value) > 0 {
+			sb.WriteString("=\"" + html.EscapeString(value) + "\"")
+		}
+	}
+}
+
+//#endregion
