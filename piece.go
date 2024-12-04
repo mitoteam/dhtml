@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"reflect"
+	"strings"
 )
 
 // HtmlPiece is set of one or several html elements (or no elements at all). Could be tags, complex elements, text content etc.
@@ -12,8 +13,9 @@ type HtmlPiece struct {
 	list []ElementI
 }
 
-// force interface implementation declaring fake variable
+// force interfaces implementation declaring fake variable
 var _ ElementI = (*HtmlPiece)(nil)
+var _ fmt.Stringer = (*HtmlPiece)(nil)
 
 // Shorthand helper for NewHtmlPiece() constructor
 func Piece(first_element any) *HtmlPiece {
@@ -22,11 +24,9 @@ func Piece(first_element any) *HtmlPiece {
 
 // Actual Constructor
 func NewHtmlPiece() *HtmlPiece {
-	l := &HtmlPiece{
+	return &HtmlPiece{
 		list: make([]ElementI, 0),
 	}
-
-	return l
 }
 
 func (l *HtmlPiece) IsEmpty() bool {
@@ -76,6 +76,11 @@ func (l *HtmlPiece) AppendText(text string) *HtmlPiece {
 	return l
 }
 
+// Elements count
+func (l *HtmlPiece) GetElementsCount() int {
+	return len(l.list)
+}
+
 // ElementI implementation
 func (l *HtmlPiece) GetTags() TagsList {
 	tag_list := make(TagsList, 0)
@@ -87,9 +92,17 @@ func (l *HtmlPiece) GetTags() TagsList {
 	return tag_list
 }
 
-// Elements count
-func (l *HtmlPiece) GetElementsCount() int {
-	return len(l.list)
+// render everything to string as HTML
+func (l HtmlPiece) String() string {
+	var sb strings.Builder
+
+	for _, element := range l.list {
+		for _, tag := range element.GetTags() {
+			sb.WriteString(tag.String())
+		}
+	}
+
+	return sb.String()
 }
 
 //endregion

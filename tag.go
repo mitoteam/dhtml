@@ -147,9 +147,7 @@ func (t *Tag) IsInline() bool {
 func (t *Tag) String() string {
 	var sb strings.Builder
 
-	for _, tag := range t.GetTags() {
-		tag.renderTag(0, &sb)
-	}
+	t.renderTag(0, &sb)
 
 	return sb.String()
 }
