@@ -38,7 +38,7 @@ type (
 		id      string
 		classes []string
 
-		children ElementsList
+		children ElementList
 
 		text string //comments and raw text content
 	}
@@ -55,7 +55,7 @@ func NewTag(tag string) *Tag {
 		attributes: make(map[string]string),
 		classes:    make([]string, 0),
 
-		children: make(ElementsList, 0),
+		children: *NewElementList(),
 	}
 
 	return r
@@ -68,20 +68,14 @@ func (t *Tag) GetTags() TagsList {
 
 // Adds child element
 func (t *Tag) Append(element ElementI) *Tag {
-	t.children = append(t.children, element)
+	t.children.Append(element)
 	return t
 }
 
 // Adds child element
-func (t *Tag) AppendList(list ElementsList) *Tag {
-	t.children = append(t.children, list...)
+func (t *Tag) AppendList(list *ElementList) *Tag {
+	t.children.AppendList(list)
 	return t
-}
-
-// Adds child element to the beginning of children list
-func (e *Tag) Prepend(element ElementI) *Tag {
-	e.children = append(ElementsList{element}, e.children...)
-	return e
 }
 
 func (e *Tag) Id(id string) *Tag {
@@ -147,12 +141,8 @@ func (t *Tag) IsInline() bool {
 	}
 
 	//has no not inline children
-	for _, child := range t.children {
-		if tag, ok := child.(*Tag); ok {
-			if !tag.IsInline() || (tag.kind == tagKindNormal && !slices.Contains(inline_preferred_tags, tag.tag)) {
-				return false
-			}
-		} else {
+	for _, child_tag := range t.children.GetTags() {
+		if !child_tag.IsInline() || (child_tag.kind == tagKindNormal && !slices.Contains(inline_preferred_tags, child_tag.tag)) {
 			return false
 		}
 	}
@@ -199,7 +189,7 @@ func (t *Tag) renderTag(level int, sb *strings.Builder) {
 
 	if slices.Contains(void_tags, t.tag) {
 		// void tag
-		if len(t.children) == 0 {
+		if t.children.IsEmpty() {
 			sb.WriteString("/>")
 		} else {
 			log.Fatalf("Void tag <%s> can not have children", t.tag)
@@ -210,23 +200,20 @@ func (t *Tag) renderTag(level int, sb *strings.Builder) {
 		previousIsContent := false
 
 		//go deeper (recursion)
-		for _, child_element := range t.children {
-			child_level := level + 1
-
-			for _, child_tag := range child_element.GetTags() {
-				if t.IsInline() {
-					child_level = 0
-				}
-
-				//separate two consecutive content elements with space
-				if previousIsContent && child_tag.kind == tagKindText {
-					sb.WriteString(" ")
-				}
-
-				child_tag.renderTag(child_level, sb)
-
-				previousIsContent = child_tag.kind == tagKindText
+		child_level := level + 1
+		for _, child_tag := range t.children.GetTags() {
+			if t.IsInline() {
+				child_level = 0
 			}
+
+			//separate two consecutive content elements with space
+			if previousIsContent && child_tag.kind == tagKindText {
+				sb.WriteString(" ")
+			}
+
+			child_tag.renderTag(child_level, sb)
+
+			previousIsContent = child_tag.kind == tagKindText
 		}
 
 		//closing tag
