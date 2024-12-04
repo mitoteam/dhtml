@@ -1,6 +1,9 @@
 package dhtml
 
-import "slices"
+import (
+	"fmt"
+	"slices"
+)
 
 // HTML Document complex helper
 
@@ -10,6 +13,9 @@ type Document struct {
 
 	stylesheets []string
 }
+
+// force interfaces implementation
+var _ fmt.Stringer = (*Document)(nil)
 
 func NewDocument() *Document {
 	return &Document{}
@@ -53,10 +59,10 @@ func (d *Document) Stylesheet(href string) *Document {
 	return d
 }
 
-func (d *Document) Render() string {
+func (d *Document) String() string {
 	root := NewTag("html").
 		Append(d.Head()).
 		Append(d.Body())
 
-	return root.Render()
+	return root.String()
 }

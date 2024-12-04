@@ -1,6 +1,7 @@
 package dhtml
 
 import (
+	"fmt"
 	"html"
 	"log"
 	"maps"
@@ -43,8 +44,9 @@ type (
 	}
 )
 
-// force interface implementation
-var _ ElementI = &Tag{}
+// force interfaces implementation
+var _ ElementI = (*Tag)(nil)
+var _ fmt.Stringer = (*Tag)(nil)
 
 // Tag constructor
 func NewTag(tag string) *Tag {
@@ -142,7 +144,7 @@ func (t *Tag) IsInline() bool {
 //region Renderer
 
 // Renders element with all the children as HTML
-func (t *Tag) Render() string {
+func (t *Tag) String() string {
 	var sb strings.Builder
 
 	for _, tag := range t.GetTags() {
