@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/elliotchance/orderedmap/v2"
-	"github.com/mitoteam/mttools"
 )
 
 const (
@@ -36,7 +35,7 @@ type (
 		attributes map[string]string
 
 		id      string
-		classes []string
+		classes Classes
 
 		children HtmlPiece
 
@@ -53,9 +52,6 @@ func NewTag(tag string) *Tag {
 		tag: SafeTagName(tag),
 
 		attributes: make(map[string]string),
-		classes:    make([]string, 0),
-
-		children: *NewHtmlPiece(),
 	}
 
 	return r
@@ -77,6 +73,7 @@ func (e *Tag) Id(id string) *Tag {
 	return e
 }
 
+// Sets attribute.
 func (e *Tag) Attribute(name, value string) *Tag {
 	e.attributes[SafeAttributeName(name)] = html.EscapeString(value)
 	return e
@@ -86,18 +83,21 @@ func (e *Tag) GetAttribute(name string) string {
 	return e.attributes[name]
 }
 
-func (e *Tag) Class(class_name string) *Tag {
-	e.classes = append(e.classes, SafeClassName(class_name))
+func (e *Tag) Title(s string) *Tag {
+	if s != "" {
+		e.Attribute("title", s)
+	}
 	return e
 }
 
-func (e *Tag) Classes(classes []string) *Tag {
-	for _, class_name := range classes {
-		SafeClassName(class_name)
-	}
-
-	e.classes = append(e.classes, classes...)
+// Adds one or more CSS classes.
+func (e *Tag) Class(v any) *Tag {
+	e.classes.Add(v)
 	return e
+}
+
+func (e *Tag) GetClasses() *Classes {
+	return &e.classes
 }
 
 func (e *Tag) Text(content string) *Tag {
@@ -139,7 +139,8 @@ func (t *Tag) IsInline() bool {
 	return true
 }
 
-// #region Renderer
+//region Renderer
+
 // Renders element with all the children as HTML
 func (t *Tag) Render() string {
 	var sb strings.Builder
@@ -225,8 +226,8 @@ func (t *Tag) renderAttributes(sb *strings.Builder) {
 	}
 
 	//CSS classes
-	if len(t.classes) > 0 {
-		attributes.Set("class", strings.Join(mttools.UniqueSlice(t.classes), " "))
+	if t.classes.GetCount() > 0 {
+		attributes.Set("class", t.classes.String())
 		delete(t.attributes, "class") //prefer e.class over direct attributes
 	}
 
@@ -247,4 +248,4 @@ func (t *Tag) renderAttributes(sb *strings.Builder) {
 	}
 }
 
-//#endregion
+//endregion
