@@ -54,19 +54,11 @@ func (l *HtmlPiece) AppendElement(e ElementI) *HtmlPiece {
 	return l
 }
 
-// Shorthand for Append()
-func (l *HtmlPiece) AE(e ElementI) *HtmlPiece { return l.AppendElement(e) }
-
 // Adds single element to list
 func (l *HtmlPiece) AppendList(another_list *HtmlPiece) *HtmlPiece {
 	l.list = append(l.list, another_list.list...)
 
 	return l
-}
-
-// Shorthand for AppendList()
-func (l *HtmlPiece) AL(another_list *HtmlPiece) *HtmlPiece {
-	return l.AppendList(another_list)
 }
 
 // Adds text element to list
@@ -75,9 +67,6 @@ func (l *HtmlPiece) AppendText(text string) *HtmlPiece {
 
 	return l
 }
-
-// Shorthand for AppendText()
-func (l *HtmlPiece) AT(text string) *HtmlPiece { return l.AppendText(text) }
 
 // ElementI implementation
 func (l *HtmlPiece) GetTags() TagsList {
@@ -88,6 +77,11 @@ func (l *HtmlPiece) GetTags() TagsList {
 	}
 
 	return tag_list
+}
+
+// Elements count
+func (l *HtmlPiece) GetElementsCount() int {
+	return len(l.list)
 }
 
 //endregion

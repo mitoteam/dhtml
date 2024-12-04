@@ -1,5 +1,7 @@
 package dhtml
 
+//Some basic shorthands.
+
 func Div() *Tag {
 	return NewTag("div")
 }
@@ -9,10 +11,15 @@ func Span() *Tag {
 }
 
 func Text(text string) *Tag {
-	r := &Tag{
+	return &Tag{
 		kind: tagKindText,
 		text: text,
 	}
+}
 
-	return r
+func Comment(text string) *Tag {
+	return &Tag{
+		kind: tagKindComment,
+		text: text,
+	}
 }

@@ -19,7 +19,7 @@ const (
 
 var (
 	inline_preferred_tags = []string{
-		"i", "b", "span",
+		"i", "em", "b", "strong", "span", "small", "del", "ins",
 	}
 
 	//https://html.spec.whatwg.org/multipage/syntax.html#void-elements
@@ -101,26 +101,16 @@ func (e *Tag) Classes(classes []string) *Tag {
 }
 
 func (e *Tag) Text(content string) *Tag {
-	r := &Tag{
-		kind: tagKindText,
-		text: content,
-	}
+	return e.Append(Text(content))
+}
 
-	return e.Append(r)
+// Adds html comment as a child to the element
+func (e *Tag) Comment(text string) *Tag {
+	return e.Append(Comment(text))
 }
 
 func (e *Tag) IsText() bool {
 	return e.kind == tagKindText
-}
-
-// Adds html comment as a child to the element
-func (e *Tag) Comment(content string) *Tag {
-	r := &Tag{
-		kind: tagKindComment,
-		text: content,
-	}
-
-	return e.Append(r)
 }
 
 func (e *Tag) IsComment() bool {
@@ -129,9 +119,14 @@ func (e *Tag) IsComment() bool {
 
 // true if this tag could be rendered inline, false - should be rendered on new line and indented.
 func (t *Tag) IsInline() bool {
-	//content has no children so considered inline
-	if t.kind == tagKindText {
+	//content or comments has no children so considered inline
+	if t.kind == tagKindText || t.kind == tagKindComment {
 		return true
+	}
+
+	// too many children
+	if t.children.GetElementsCount() > 4 {
+		return false
 	}
 
 	//has no not inline children
