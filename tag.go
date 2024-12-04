@@ -67,14 +67,8 @@ func (t *Tag) GetTags() TagsList {
 }
 
 // Adds child element
-func (t *Tag) Append(element ElementI) *Tag {
-	t.children.Append(element)
-	return t
-}
-
-// Adds child element
-func (t *Tag) AppendList(list *ElementList) *Tag {
-	t.children.AppendList(list)
+func (t *Tag) Append(v any) *Tag {
+	t.children.Append(v)
 	return t
 }
 

@@ -1,5 +1,11 @@
 package dhtml
 
+import (
+	"fmt"
+	"log"
+	"reflect"
+)
+
 type (
 	ElementI interface {
 		GetTags() TagsList
@@ -9,28 +15,18 @@ type (
 	TagsList []*Tag
 )
 
-// region ElementList
-type (
-	ElementList struct {
-		list []ElementI
-	}
-)
+//region ElementList
+
+type ElementList struct {
+	list []ElementI
+}
 
 // force interface implementation declaring fake variable
 var _ ElementI = (*ElementList)(nil)
 
-// Shorthand helper for NewList() constructor
-func Piece[T string | *ElementList](first_element T) *ElementList {
-	list := NewElementList()
-
-	//https://ectobit.com/blog/check-type-of-generic-parameter/
-	if s, ok := any(first_element).(string); ok {
-		list.AppendText(s)
-	} else {
-		list.AppendList(any(first_element).(*ElementList))
-	}
-
-	return list
+// Shorthand helper for NewElementList() constructor
+func Piece(first_element any) *ElementList {
+	return NewElementList().AppendElement(AnyToElement(first_element))
 }
 
 // Actual Constructor
@@ -46,15 +42,29 @@ func (l *ElementList) IsEmpty() bool {
 	return len(l.list) == 0
 }
 
+// Adds something to list
+func (l *ElementList) Append(v any) *ElementList {
+	switch v := v.(type) {
+	case *ElementList:
+		return l.AppendList(v)
+
+	case ElementI:
+		return l.AppendElement(v)
+
+	default:
+		return l.AppendElement(AnyToElement(v))
+	}
+}
+
 // Adds single element to list
-func (l *ElementList) Append(e ElementI) *ElementList {
+func (l *ElementList) AppendElement(e ElementI) *ElementList {
 	l.list = append(l.list, e)
 
 	return l
 }
 
 // Shorthand for Append()
-func (l *ElementList) A(e ElementI) *ElementList { return l.Append(e) }
+func (l *ElementList) AE(e ElementI) *ElementList { return l.AppendElement(e) }
 
 // Adds single element to list
 func (l *ElementList) AppendList(another_list *ElementList) *ElementList {
@@ -87,6 +97,34 @@ func (l *ElementList) GetTags() TagsList {
 	}
 
 	return tag_list
+}
+
+//endregion
+
+//region Helper functions
+
+// Helper to convert any value to ElementI
+func AnyToElement(v any) ElementI {
+	//https://stackoverflow.com/questions/72267243/unioning-an-interface-with-a-type-in-golang
+	switch v := v.(type) {
+	case ElementI:
+		return v
+
+	case string:
+		return Text(v)
+
+	case fmt.Stringer:
+		return Text(v.String())
+	}
+
+	// handle the remaining type set of ~string
+	r := reflect.ValueOf(v)
+	if r.Kind() == reflect.String {
+		return Text(r.String())
+	}
+
+	log.Panicf("unsupported type: %s", r.Type().Name())
+	return nil
 }
 
 //endregion
