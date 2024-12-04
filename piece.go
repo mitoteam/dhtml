@@ -35,9 +35,17 @@ func (l *HtmlPiece) IsEmpty() bool {
 
 // Adds something to list
 func (l *HtmlPiece) Append(v any) *HtmlPiece {
+	if v == nil || v == "" {
+		//nothing to append
+		return l
+	}
+
 	switch v := v.(type) {
+	case HtmlPiece:
+		return l.AppendPiece(&v)
+
 	case *HtmlPiece:
-		return l.AppendList(v)
+		return l.AppendPiece(v)
 
 	case ElementI:
 		return l.AppendElement(v)
@@ -55,8 +63,8 @@ func (l *HtmlPiece) AppendElement(e ElementI) *HtmlPiece {
 }
 
 // Adds single element to list
-func (l *HtmlPiece) AppendList(another_list *HtmlPiece) *HtmlPiece {
-	l.list = append(l.list, another_list.list...)
+func (l *HtmlPiece) AppendPiece(another_piece *HtmlPiece) *HtmlPiece {
+	l.list = append(l.list, another_piece.list...)
 
 	return l
 }
