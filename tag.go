@@ -38,7 +38,7 @@ type (
 		id      string
 		classes []string
 
-		children ElementList
+		children HtmlPiece
 
 		text string //comments and raw text content
 	}
@@ -55,7 +55,7 @@ func NewTag(tag string) *Tag {
 		attributes: make(map[string]string),
 		classes:    make([]string, 0),
 
-		children: *NewElementList(),
+		children: *NewHtmlPiece(),
 	}
 
 	return r
