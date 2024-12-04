@@ -25,10 +25,15 @@ func (d *Document) Body() *Tag {
 
 func (d *Document) Head() *Tag {
 	if d.head == nil {
-		d.head = NewTag("head1")
+		d.head = NewTag("head")
 	}
 
 	return d.head
+}
+
+func (d *Document) Title(title string) *Document {
+	d.Head().Append(NewTag("title").Text(title))
+	return d
 }
 
 func (d *Document) Stylesheet(href string) *Document {
