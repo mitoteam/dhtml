@@ -8,10 +8,10 @@ func Span() *Tag {
 	return NewTag("span")
 }
 
-func Content(content string) *Tag {
+func Text(text string) *Tag {
 	r := &Tag{
 		kind: tagKindText,
-		text: content,
+		text: text,
 	}
 
 	return r
