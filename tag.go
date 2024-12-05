@@ -71,7 +71,7 @@ func (t *Tag) Append(v any) *Tag {
 }
 
 func (e *Tag) Id(id string) *Tag {
-	e.id = id
+	e.id = SafeId(id)
 	return e
 }
 

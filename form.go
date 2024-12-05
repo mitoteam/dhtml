@@ -1,7 +1,5 @@
 package dhtml
 
-// HTML Document complex helper
-
 type FormElement struct {
 	body HtmlPiece
 }
@@ -9,12 +7,19 @@ type FormElement struct {
 // force interfaces implementation
 var _ ElementI = (*FormElement)(nil)
 
-func Form() *FormElement {
+func NewForm() *FormElement {
 	return &FormElement{}
 }
 
-func (f FormElement) GetTags() TagsList {
-	f.body.Append("Test Form body")
+func (f *FormElement) Append(v any) *FormElement {
+	f.body.Append(v)
+	return f
+}
 
-	return f.body.GetTags()
+func (f *FormElement) GetTags() TagsList {
+	root_tag := NewTag("form").Attribute("method", "post")
+
+	root_tag.Append(f.body)
+
+	return root_tag.GetTags()
 }
