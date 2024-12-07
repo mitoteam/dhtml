@@ -1,6 +1,9 @@
 package dhtml
 
-//Some basic shorthands.
+//Some basic type and helper shorthands.
+
+// Function returning some html.
+type RenderFunc func() HtmlPiece
 
 func Div() *Tag {
 	return NewTag("div")

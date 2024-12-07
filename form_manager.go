@@ -7,7 +7,8 @@ import (
 // HTML forms
 
 type FormHandler struct {
-	id        string
+	id string
+
 	RenderF   func() *FormElement
 	ValidateF func()
 	SubmitF   func()
@@ -32,6 +33,11 @@ func (m *formManagerT) Register(id string, form *FormHandler) {
 
 	form.id = id
 	m.list[id] = form
+}
+
+func (m *formManagerT) IsRegistered(id string) bool {
+	_, ok := m.list[id]
+	return ok
 }
 
 func (m *formManagerT) GetHandler(id string) *FormHandler {
