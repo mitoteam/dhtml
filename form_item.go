@@ -9,8 +9,9 @@ type FormItemI interface {
 }
 
 type FormItemBase struct {
-	name    string
-	renderF RenderFunc
+	name         string
+	defaultValue any
+	renderF      RenderFunc
 }
 
 func (fi *FormItemBase) GetName() string {

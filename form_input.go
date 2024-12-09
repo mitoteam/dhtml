@@ -1,5 +1,9 @@
 package dhtml
 
+import (
+	"github.com/mitoteam/mttools"
+)
+
 type InputFormItem struct {
 	FormItemExtBase
 	inputType string
@@ -21,6 +25,11 @@ func (fi *InputFormItem) Label(v any) *InputFormItem {
 	return fi
 }
 
+func (fi *InputFormItem) DefaultValue(v any) *InputFormItem {
+	fi.defaultValue = v
+	return fi
+}
+
 func (fi *InputFormItem) Note(v any) *InputFormItem {
 	fi.note.Append(v)
 	return fi
@@ -35,10 +44,9 @@ func (fi *InputFormItem) Render() HtmlPiece {
 		)
 	}
 
-	input_tag := NewTag("input").
-		Id(fi.GetId()).
-		Class("form-control").
-		Attribute("type", fi.inputType)
+	input_tag := NewTag("input").Id(fi.GetId()).Class("form-control").
+		Attribute("type", fi.inputType).
+		Attribute("value", mttools.AnyToString(fi.defaultValue))
 
 	out.Append(input_tag)
 
