@@ -13,7 +13,7 @@ import (
 type FormHandler struct {
 	id string
 
-	RenderF   func(form *FormElement)
+	RenderF   func(form *FormElement, fd *FormData)
 	ValidateF func(fd *FormData)
 	SubmitF   func(fd *FormData)
 }
@@ -66,7 +66,9 @@ type FormData struct {
 	args     url.Values
 	values   url.Values
 
-	errorList map[string][]HtmlPiece //map of error lists by form item name
+	errorList   map[string][]HtmlPiece //map of error lists by form item name
+	rebuild     bool                   // rebuild form with same data again
+	redirectUrl string                 // issue an redirect to this URL
 }
 
 func NewFormData() *FormData {
@@ -88,6 +90,22 @@ func (fd *FormData) GetValue(name string) any {
 	} else {
 		return nil
 	}
+}
+
+func (fd *FormData) IsRebuild() bool {
+	return fd.rebuild
+}
+
+func (fd *FormData) SetRebuild(v bool) {
+	fd.rebuild = v
+}
+
+func (fd *FormData) GetRedirect() string {
+	return fd.redirectUrl
+}
+
+func (fd *FormData) SetRedirect(url string) {
+	fd.redirectUrl = url
 }
 
 func (fd *FormData) SetItemError(form_item_name string, v any) {
@@ -127,55 +145,74 @@ func (fd *FormData) RenderErrors() (out HtmlPiece) {
 
 // ========= Form processing and rendering ===========
 // Process form data, build it and render
-func RenderForm(fh *FormHandler, request *http.Request) *HtmlPiece {
-	var out HtmlPiece
-	var form_data *FormData
-	var is_rebuild bool
+func RenderForm(fh *FormHandler, w http.ResponseWriter, request *http.Request) *HtmlPiece {
+	var formOut HtmlPiece
+	var fd *FormData
+	var isPost bool //false - form is being built for the first time, true - processing form submit by POST request
 
 	// check if it is being re-build (from POST request)
 	if build_id := request.PostFormValue("form_build_id"); build_id != "" {
-		if form_data, is_rebuild = formDataStore[build_id]; is_rebuild {
+		if fd, isPost = formDataStore[build_id]; isPost {
 			//hydrate form_data.values from POST data
-			for name := range form_data.values {
+			for name := range fd.values {
 				if postValue, ok := request.PostForm[name]; ok {
-					form_data.values[name] = postValue
+					fd.values[name] = postValue
 				}
 			}
 		}
-	}
-
-	// new form being built
-	if form_data == nil {
-		form_data = NewFormData()
 	}
 
 	//out.Append(Dbg("%s: %s", request.Method, form_data.build_id))
 	//out.Append(Dbg("RAW post data: %v", request.PostForm))
 	//out.Append(Dbg("FormData.values: %v", form_data.values))
 
-	if is_rebuild {
-		fh.ValidateF(form_data)
+	if isPost {
+		fd.SetRedirect("")
+		fd.SetRebuild(false)
+		fd.ClearErrors()
 
-		if len(form_data.errorList) > 0 {
-			out.Append(Div().Class("errors").Append(form_data.RenderErrors()))
+		fh.ValidateF(fd)
+
+		if len(fd.errorList) > 0 {
+			formOut.Append(Div().Class("errors").Append(fd.RenderErrors()))
+			fd.SetRebuild(true) //and display form again
+		} else {
+			//there were no errors
+			fh.SubmitF(fd)
+		}
+
+		if !fd.rebuild {
+			delete(formDataStore, fd.build_id)
+
+			if fd.redirectUrl != "" {
+				http.Redirect(w, request, fd.redirectUrl, http.StatusSeeOther)
+				return NewHtmlPiece() //empty html
+			}
+
+			//we are not rebuilding, should be completely new FormData
+			fd = nil
 		}
 	}
 
-	form := NewForm()
-	form.formData = form_data
+	if fd == nil {
+		fd = NewFormData()
+	}
 
-	fh.RenderF(form)
+	form := NewForm()
+	form.formData = fd
+
+	fh.RenderF(form, fd)
 
 	// form.Append(build_id_hidden.renderF().String()) //DBG
-	form.Append(NewFormHidden("form_build_id", form_data.build_id))
+	form.Append(NewFormHidden("form_build_id", fd.build_id))
 
-	formDataStore[form_data.build_id] = form_data
+	formDataStore[fd.build_id] = fd
 
-	out.Append(form)
+	formOut.Append(form)
 
 	//wrap it all into container <div>
 	div := Div().Class("dhtml-form").
-		Append(out)
+		Append(formOut)
 
 	return Piece(div)
 }

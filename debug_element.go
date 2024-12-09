@@ -17,8 +17,8 @@ var _ ElementI = (*DebugElement)(nil)
 func NewDebugElement(skip int) *DebugElement {
 	e := &DebugElement{}
 
-	if pc, file, line, ok := runtime.Caller(skip); ok {
-		e.label.Textf("%s:%d, %v", file, line, runtime.FuncForPC(pc).Name())
+	if _, file, line, ok := runtime.Caller(skip); ok {
+		e.label.Textf("%s:%d", file, line)
 	}
 
 	return e
