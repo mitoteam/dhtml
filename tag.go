@@ -180,7 +180,7 @@ func (t *Tag) renderTag(level int, sb *strings.Builder) {
 	if slices.Contains(void_tags, t.tag) {
 		// void tag
 		if t.children.IsEmpty() {
-			sb.WriteString("/>")
+			sb.WriteString(" />")
 		} else {
 			log.Fatalf("Void tag <%s> can not have children", t.tag)
 		}
