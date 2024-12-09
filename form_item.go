@@ -27,10 +27,8 @@ func (fi *FormItemBase) GetTags() TagsList {
 		log.Panic("Form item render function not set")
 		return nil
 	} else {
-		internal := fi.renderF()
-
 		return Div().Class("form-item").
-			Append(internal).
+			Append(fi.renderF()).
 			GetTags()
 	}
 }

@@ -78,3 +78,9 @@ func AnyToClasslist(v any) []string {
 
 	return list
 }
+
+// Helper to create Classes from any value
+func AnyToClasses(v any) (c Classes) {
+	c.Add(AnyToClasslist(v))
+	return c
+}
