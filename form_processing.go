@@ -2,7 +2,6 @@ package dhtml
 
 import (
 	"net/http"
-	"net/url"
 
 	"github.com/mitoteam/mttools"
 )
@@ -27,8 +26,8 @@ type FormLabelsT map[string]HtmlPiece
 
 type FormData struct {
 	build_id string
-	args     url.Values
-	values   url.Values
+	args     mttools.Values
+	values   mttools.Values
 	labels   FormLabelsT
 
 	errorList   FormErrorsT //map of error lists by form item name
@@ -39,23 +38,15 @@ type FormData struct {
 func NewFormData() *FormData {
 	return &FormData{
 		build_id:  "fd_" + mttools.RandomString(64),
-		args:      make(url.Values),
-		values:    make(url.Values),
+		args:      mttools.NewValues(),
+		values:    mttools.NewValues(),
 		errorList: make(FormErrorsT, 0),
 		labels:    make(FormLabelsT, 0),
 	}
 }
 
 func (fd *FormData) GetValue(name string) any {
-	if v, ok := fd.values[name]; ok {
-		if len(v) == 1 { //url.Values values are always arrays
-			return v[0]
-		} else {
-			return v
-		}
-	} else {
-		return nil
-	}
+	return fd.values.Get(name)
 }
 
 func (fd *FormData) IsRebuild() bool {
@@ -113,9 +104,13 @@ func renderForm(fh *FormHandler, w http.ResponseWriter, r *http.Request) *HtmlPi
 	if build_id := r.PostFormValue("form_build_id"); build_id != "" {
 		if fd, isPost = formDataStore[build_id]; isPost {
 			//hydrate form_data.values from POST data
-			for name := range fd.values {
+			for name := range fd.values.GetNamesIterator() {
 				if postValue, ok := r.PostForm[name]; ok {
-					fd.values[name] = postValue
+					if len(postValue) == 1 {
+						fd.values.Set(name, postValue[0])
+					} else {
+						fd.values.Set(name, postValue)
+					}
 				}
 			}
 		}

@@ -18,14 +18,10 @@ func (f *FormElement) Append(v any) *FormElement {
 		if e, ok := v.(FormItemI); ok {
 			fd := f.formData
 
-			if value, ok := fd.values[e.GetName()]; ok {
-				if len(value) == 1 { //all Request.PostForm values are arrays of at least one element
-					e.SetValue(value[0])
-				} else {
-					e.SetValue(value)
-				}
+			if value, ok := fd.values.GetOk(e.GetName()); ok {
+				e.SetValue(value)
 			} else {
-				fd.values[e.GetName()] = []string{""} //add empty string to data
+				fd.values.Set(e.GetName(), "") //add empty string to data
 			}
 
 			fd.labels[e.GetName()] = e.GetLabel()
