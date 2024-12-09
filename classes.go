@@ -52,35 +52,21 @@ func (c *Classes) AddFromSet(v any, class_set []string) *Classes {
 
 // CSS-classes string "parser"
 func AnyToClasslist(v any) []string {
-	var (
-		s    string
-		list []string
-	)
+	var list []string
 
-	//https://stackoverflow.com/questions/72267243/unioning-an-interface-with-a-type-in-golang
-	switch v := v.(type) {
-	case string:
-		s = v
+	s, ok := mttools.AnyToStringOk(v)
 
-	case fmt.Stringer:
-		s = v.String()
+	if !ok { //it is not a string
+		list, ok = v.([]string) // is it string list?
 
-	case []string:
-		list = v
-
-	default:
-		// handle the remaining type set of ~string
-		r := reflect.ValueOf(v)
-		if r.Kind() == reflect.String {
-			s = r.String()
-		} else {
-			log.Panicf("unsupported type: %s", r.Type().Name())
+		if !ok {
+			log.Panicf("unsupported type: %s", reflect.ValueOf(v).Type().Name())
 		}
 	}
 
 	if list == nil {
 		if s == "" {
-			return []string{} //empty list
+			return []string{} //no string or list found, return empty list
 		} else {
 			list = strings.Fields(strings.TrimSpace(s))
 		}

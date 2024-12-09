@@ -5,6 +5,8 @@ import (
 	"log"
 	"reflect"
 	"strings"
+
+	"github.com/mitoteam/mttools"
 )
 
 // HtmlPiece is set of one or several html elements (or no elements at all). Could be tags, complex elements, text content etc.
@@ -111,25 +113,15 @@ func (l HtmlPiece) String() string {
 
 // Helper to convert any value to ElementI
 func AnyToElement(v any) ElementI {
-	//https://stackoverflow.com/questions/72267243/unioning-an-interface-with-a-type-in-golang
-	switch v := v.(type) {
-	case ElementI:
+	if v, ok := v.(ElementI); ok {
 		return v
-
-	case string:
-		return Text(v)
-
-	case fmt.Stringer:
-		return Text(v.String())
 	}
 
-	// handle the remaining type set of ~string
-	r := reflect.ValueOf(v)
-	if r.Kind() == reflect.String {
-		return Text(r.String())
+	if s, ok := mttools.AnyToStringOk(v); ok {
+		return Text(s)
 	}
 
-	log.Panicf("unsupported type: %s", r.Type().Name())
+	log.Panicf("unsupported type: %s", reflect.ValueOf(v).Type().Name())
 	return nil
 }
 

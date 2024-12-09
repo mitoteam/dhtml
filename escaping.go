@@ -23,7 +23,7 @@ func CheckTagName(name string) error {
 }
 
 func SafeTagName(name string) string {
-	name = strings.ToLower(name)
+	name = strings.ToLower(strings.TrimSpace(name))
 
 	if err := CheckTagName(name); err != nil {
 		log.Fatalln(err)
@@ -41,7 +41,7 @@ func CheckAttributeName(name string) error {
 }
 
 func SafeAttributeName(name string) string {
-	name = strings.ToLower(name)
+	name = strings.ToLower(strings.TrimSpace(name))
 
 	if err := CheckAttributeName(name); err != nil {
 		log.Fatalln(err)
@@ -59,7 +59,7 @@ func CheckClassName(name string) error {
 }
 
 func SafeClassName(name string) string {
-	name = strings.ToLower(name)
+	name = strings.ToLower(strings.TrimSpace(name))
 
 	if err := CheckClassName(name); err != nil {
 		log.Fatalln(err)
@@ -77,7 +77,7 @@ func CheckId(s string) error {
 }
 
 func SafeId(s string) string {
-	s = strings.ToLower(s)
+	s = strings.ToLower(strings.TrimSpace(s))
 
 	if err := CheckId(s); err != nil {
 		log.Fatalln(err)
