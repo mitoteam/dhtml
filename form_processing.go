@@ -45,6 +45,14 @@ func NewFormData() *FormData {
 	}
 }
 
+func (fd *FormData) GetArg(name string) any {
+	return fd.args.Get(name)
+}
+
+func (fd *FormData) GetAllArgs() mttools.Values {
+	return fd.args
+}
+
 func (fd *FormData) GetValue(name string) any {
 	return fd.values.Get(name)
 }
@@ -95,7 +103,7 @@ func (fd *FormData) ClearErrors() {
 }
 
 // Process form data, build it and render
-func renderForm(fh *FormHandler, w http.ResponseWriter, r *http.Request) *HtmlPiece {
+func renderForm(fh *FormHandler, w http.ResponseWriter, r *http.Request, args mttools.Values) *HtmlPiece {
 	var formOut HtmlPiece
 	var fd *FormData
 	var isPost bool //false - form is being built for the first time, true - processing form submit by POST request
@@ -150,6 +158,7 @@ func renderForm(fh *FormHandler, w http.ResponseWriter, r *http.Request) *HtmlPi
 
 	if fd == nil {
 		fd = NewFormData()
+		fd.args = args
 	}
 
 	form := NewForm()
