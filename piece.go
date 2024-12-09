@@ -78,6 +78,12 @@ func (l *HtmlPiece) AppendText(text string) *HtmlPiece {
 	return l
 }
 
+func (l *HtmlPiece) Textf(format string, a ...any) *HtmlPiece {
+	l.list = append(l.list, Textf(format, a...))
+
+	return l
+}
+
 // Elements count
 func (l *HtmlPiece) GetElementsCount() int {
 	return len(l.list)
