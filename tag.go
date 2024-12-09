@@ -123,6 +123,10 @@ func (e *Tag) IsComment() bool {
 	return e.kind == tagKindComment
 }
 
+func (e *Tag) HasChildren() bool {
+	return !e.children.IsEmpty()
+}
+
 // true if this tag could be rendered inline, false - should be rendered on new line and indented.
 func (t *Tag) IsInline() bool {
 	//content or comments has no children so considered inline

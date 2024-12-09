@@ -22,14 +22,16 @@ func init() {
 	formDataStore = make(map[string]*FormData)
 }
 
+type FormErrors map[string][]HtmlPiece
+
 type FormData struct {
 	build_id string
 	args     url.Values
 	values   url.Values
 
-	errorList   map[string][]HtmlPiece //map of error lists by form item name
-	rebuild     bool                   // rebuild form with same data again
-	redirectUrl string                 // issue an redirect to this URL
+	errorList   FormErrors //map of error lists by form item name
+	rebuild     bool       // rebuild form with same data again
+	redirectUrl string     // issue an redirect to this URL
 }
 
 func NewFormData() *FormData {
@@ -37,7 +39,7 @@ func NewFormData() *FormData {
 		build_id:  "fd_" + mttools.RandomString(64),
 		args:      make(url.Values),
 		values:    make(url.Values),
-		errorList: make(map[string][]HtmlPiece, 0),
+		errorList: make(FormErrors, 0),
 	}
 }
 
@@ -82,6 +84,10 @@ func (fd *FormData) SetError(name string, v any) {
 	fd.SetItemError("", v)
 }
 
+func (fd *FormData) GetErrors() FormErrors {
+	return fd.errorList
+}
+
 func (fd *FormData) ClearErrors() {
 	fd.errorList = make(map[string][]HtmlPiece, 0)
 }
@@ -116,7 +122,7 @@ func renderForm(fh *FormHandler, w http.ResponseWriter, r *http.Request) *HtmlPi
 		fh.ValidateF(fd)
 
 		if len(fd.errorList) > 0 {
-			formOut.Append(Div().Class("errors").Append(FormManager.renderErrorsF(fd)))
+			formOut.Append(FormManager.renderErrorsF(fd))
 			fd.SetRebuild(true) //and display form again
 		} else {
 			//there were no errors
