@@ -22,16 +22,18 @@ func init() {
 	formDataStore = make(map[string]*FormData)
 }
 
-type FormErrors map[string][]HtmlPiece
+type FormErrorsT map[string][]HtmlPiece
+type FormLabelsT map[string]HtmlPiece
 
 type FormData struct {
 	build_id string
 	args     url.Values
 	values   url.Values
+	labels   FormLabelsT
 
-	errorList   FormErrors //map of error lists by form item name
-	rebuild     bool       // rebuild form with same data again
-	redirectUrl string     // issue an redirect to this URL
+	errorList   FormErrorsT //map of error lists by form item name
+	rebuild     bool        // rebuild form with same data again
+	redirectUrl string      // issue an redirect to this URL
 }
 
 func NewFormData() *FormData {
@@ -39,7 +41,8 @@ func NewFormData() *FormData {
 		build_id:  "fd_" + mttools.RandomString(64),
 		args:      make(url.Values),
 		values:    make(url.Values),
-		errorList: make(FormErrors, 0),
+		errorList: make(FormErrorsT, 0),
+		labels:    make(FormLabelsT, 0),
 	}
 }
 
@@ -71,6 +74,14 @@ func (fd *FormData) SetRedirect(url string) {
 	fd.redirectUrl = url
 }
 
+func (fd *FormData) GetLabel(form_item_name string) HtmlPiece {
+	if piece, ok := fd.labels[form_item_name]; ok {
+		return piece
+	}
+
+	return *Piece(form_item_name)
+}
+
 func (fd *FormData) SetItemError(form_item_name string, v any) {
 	if _, ok := fd.errorList[form_item_name]; !ok {
 		fd.errorList[form_item_name] = make([]HtmlPiece, 0, 1)
@@ -84,7 +95,7 @@ func (fd *FormData) SetError(name string, v any) {
 	fd.SetItemError("", v)
 }
 
-func (fd *FormData) GetErrors() FormErrors {
+func (fd *FormData) GetErrors() FormErrorsT {
 	return fd.errorList
 }
 

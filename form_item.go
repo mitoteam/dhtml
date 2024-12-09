@@ -6,6 +6,7 @@ type FormItemI interface {
 	ElementI
 	GetName() string
 	GetId() string
+	GetLabel() HtmlPiece
 
 	GetValue() any
 	SetValue(v any)
@@ -13,6 +14,7 @@ type FormItemI interface {
 
 type FormItemBase struct {
 	name         string
+	label        HtmlPiece
 	defaultValue any
 	value        any
 	renderF      RenderFunc
@@ -24,6 +26,10 @@ func (fi *FormItemBase) GetName() string {
 
 func (fi *FormItemBase) GetId() string {
 	return "id_" + fi.name
+}
+
+func (fi *FormItemBase) GetLabel() HtmlPiece {
+	return fi.label
 }
 
 func (fi *FormItemBase) GetValue() any {
@@ -53,18 +59,12 @@ func (fi *FormItemBase) GetTags() TagsList {
 
 type FormItemExtI interface {
 	FormItemI
-	GetLabel() HtmlPiece
 	GetNote() HtmlPiece
 }
 
 type FormItemExtBase struct {
 	FormItemBase
-	label HtmlPiece
-	note  HtmlPiece
-}
-
-func (fi *FormItemExtBase) GetLabel() HtmlPiece {
-	return fi.label
+	note HtmlPiece
 }
 
 func (fi *FormItemExtBase) GetNote() HtmlPiece {

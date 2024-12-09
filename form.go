@@ -14,8 +14,7 @@ func NewForm() *FormElement {
 }
 
 func (f *FormElement) Append(v any) *FormElement {
-	if f.formData != nil {
-		//managed form
+	if f.formData != nil { //managed form
 		if e, ok := v.(FormItemI); ok {
 			fd := f.formData
 
@@ -28,6 +27,8 @@ func (f *FormElement) Append(v any) *FormElement {
 			} else {
 				fd.values[e.GetName()] = []string{""} //add empty string to data
 			}
+
+			fd.labels[e.GetName()] = e.GetLabel()
 		}
 	}
 

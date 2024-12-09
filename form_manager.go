@@ -20,7 +20,9 @@ func init() {
 					errorOut := Div().Class("item-error")
 
 					if name != "" {
-						errorOut.Attribute("data-form-item-name", name).Textf("%s: ", name)
+						errorOut.Attribute("data-form-item-name", name).
+							Append(Span().Append(fd.GetLabel(name))).
+							Text(":")
 					}
 
 					errorOut.Append(itemError)
