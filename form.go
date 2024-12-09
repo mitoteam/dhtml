@@ -20,13 +20,13 @@ func (f *FormElement) Append(v any) *FormElement {
 			fd := f.formData
 
 			if value, ok := fd.values[e.GetName()]; ok {
-				if len(value) == 1 {
+				if len(value) == 1 { //all Request.PostForm values are arrays of at least one element
 					e.SetValue(value[0])
 				} else {
 					e.SetValue(value)
 				}
 			} else {
-				fd.values[e.GetName()] = []string{""} //empty string
+				fd.values[e.GetName()] = []string{""} //add empty string to data
 			}
 		}
 	}
