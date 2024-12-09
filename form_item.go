@@ -6,11 +6,15 @@ type FormItemI interface {
 	ElementI
 	GetName() string
 	GetId() string
+
+	GetValue() any
+	SetValue(v any)
 }
 
 type FormItemBase struct {
 	name         string
 	defaultValue any
+	value        any
 	renderF      RenderFunc
 }
 
@@ -20,6 +24,18 @@ func (fi *FormItemBase) GetName() string {
 
 func (fi *FormItemBase) GetId() string {
 	return "id_" + fi.name
+}
+
+func (fi *FormItemBase) GetValue() any {
+	if fi.value != nil {
+		return fi.value
+	}
+
+	return fi.defaultValue
+}
+
+func (fi *FormItemBase) SetValue(v any) {
+	fi.value = v
 }
 
 func (fi *FormItemBase) GetTags() TagsList {

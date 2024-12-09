@@ -106,6 +106,10 @@ func (e *Tag) Text(content string) *Tag {
 	return e.Append(Text(content))
 }
 
+func (e *Tag) Textf(format string, a ...any) *Tag {
+	return e.Append(Text(fmt.Sprintf(format, a...)))
+}
+
 // Adds html comment as a child to the element
 func (e *Tag) Comment(text string) *Tag {
 	return e.Append(Comment(text))

@@ -46,7 +46,8 @@ func (fi *InputFormItem) Render() HtmlPiece {
 
 	input_tag := NewTag("input").Id(fi.GetId()).Class("form-control").
 		Attribute("type", fi.inputType).
-		Attribute("value", mttools.AnyToString(fi.defaultValue))
+		Attribute("name", fi.GetName()).
+		Attribute("value", mttools.AnyToString(fi.GetValue()))
 
 	out.Append(input_tag)
 
