@@ -7,7 +7,7 @@ import (
 
 // HTML Document complex helper
 
-type Document struct {
+type HtmlDocument struct {
 	body *Tag
 	head *Tag
 
@@ -15,13 +15,14 @@ type Document struct {
 }
 
 // force interfaces implementation
-var _ fmt.Stringer = (*Document)(nil)
+var _ fmt.Stringer = (*HtmlDocument)(nil)
+var _ ElementI = (*HtmlDocument)(nil)
 
-func NewDocument() *Document {
-	return &Document{}
+func NewHtmlDocument() *HtmlDocument {
+	return &HtmlDocument{}
 }
 
-func (d *Document) Body() *Tag {
+func (d *HtmlDocument) Body() *Tag {
 	if d.body == nil {
 		d.body = NewTag("body")
 	}
@@ -29,7 +30,7 @@ func (d *Document) Body() *Tag {
 	return d.body
 }
 
-func (d *Document) Head() *Tag {
+func (d *HtmlDocument) Head() *Tag {
 	if d.head == nil {
 		d.head = NewTag("head")
 	}
@@ -37,12 +38,12 @@ func (d *Document) Head() *Tag {
 	return d.head
 }
 
-func (d *Document) Title(title string) *Document {
+func (d *HtmlDocument) Title(title string) *HtmlDocument {
 	d.Head().Append(NewTag("title").Text(title))
 	return d
 }
 
-func (d *Document) Stylesheet(href string) *Document {
+func (d *HtmlDocument) Stylesheet(href string) *HtmlDocument {
 	if d.stylesheets == nil {
 		d.stylesheets = make([]string, 0)
 	}
@@ -59,10 +60,14 @@ func (d *Document) Stylesheet(href string) *Document {
 	return d
 }
 
-func (d *Document) String() string {
+func (d *HtmlDocument) GetTags() TagsList {
 	root := NewTag("html").
 		Append(d.Head()).
 		Append(d.Body())
 
-	return root.String()
+	return TagsList{root}
+}
+
+func (d *HtmlDocument) String() string {
+	return d.GetTags()[0].String()
 }
