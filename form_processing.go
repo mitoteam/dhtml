@@ -22,13 +22,12 @@ func init() {
 }
 
 type FormErrorsT map[string][]HtmlPiece
-type FormLabelsT map[string]HtmlPiece
 
 type FormData struct {
 	build_id string
 	args     mttools.Values
 	values   mttools.Values
-	labels   FormLabelsT
+	labels   NamedHtmlPieces
 
 	errorList   FormErrorsT //map of error lists by form item name
 	rebuild     bool        // rebuild form with same data again
@@ -41,7 +40,7 @@ func NewFormData() *FormData {
 		args:      mttools.NewValues(),
 		values:    mttools.NewValues(),
 		errorList: make(FormErrorsT, 0),
-		labels:    make(FormLabelsT, 0),
+		labels:    NewNamedHtmlPieces(),
 	}
 }
 
@@ -73,12 +72,12 @@ func (fd *FormData) SetRedirect(url string) {
 	fd.redirectUrl = url
 }
 
-func (fd *FormData) GetLabel(form_item_name string) HtmlPiece {
-	if piece, ok := fd.labels[form_item_name]; ok {
+func (fd *FormData) GetLabel(form_item_name string) *HtmlPiece {
+	if piece, ok := fd.labels.GetOk(form_item_name); ok {
 		return piece
 	}
 
-	return *Piece(form_item_name)
+	return Piece(form_item_name) //not found, so return element's name as label
 }
 
 func (fd *FormData) SetItemError(form_item_name string, v any) {

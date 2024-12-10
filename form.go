@@ -24,7 +24,7 @@ func (f *FormElement) Append(v any) *FormElement {
 				fd.values.Set(e.GetName(), "") //add empty string to data
 			}
 
-			fd.labels[e.GetName()] = e.GetLabel()
+			fd.labels.Set(e.GetName(), e.GetLabel())
 		}
 	}
 

@@ -42,6 +42,8 @@ type (
 
 		text string //comments and raw text content
 	}
+
+	TagsList []*Tag
 )
 
 // force interfaces implementation

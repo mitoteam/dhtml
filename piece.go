@@ -2,15 +2,11 @@ package dhtml
 
 import (
 	"fmt"
-	"log"
-	"reflect"
 	"strings"
-
-	"github.com/mitoteam/mttools"
 )
 
 // HtmlPiece is set of one or several html elements (or no elements at all). Could be tags, complex elements, text content etc.
-// Every HtmlPiece as an element itself.
+// Every HtmlPiece as an element itself (so it can be rendered as HTML).
 type HtmlPiece struct {
 	list []ElementI
 }
@@ -31,69 +27,69 @@ func NewHtmlPiece() *HtmlPiece {
 	}
 }
 
-func (l *HtmlPiece) IsEmpty() bool {
-	return len(l.list) == 0
+func (p *HtmlPiece) IsEmpty() bool {
+	return len(p.list) == 0
 }
 
 // Adds something to list
-func (l *HtmlPiece) Append(v any) *HtmlPiece {
+func (p *HtmlPiece) Append(v any) *HtmlPiece {
 	if v == nil || v == "" {
 		//nothing to append
-		return l
+		return p
 	}
 
 	switch v := v.(type) {
 	case HtmlPiece:
-		return l.AppendPiece(&v)
+		return p.AppendPiece(&v)
 
 	case *HtmlPiece:
-		return l.AppendPiece(v)
+		return p.AppendPiece(v)
 
 	case ElementI:
-		return l.AppendElement(v)
+		return p.AppendElement(v)
 
 	default:
-		return l.AppendElement(AnyToElement(v))
+		return p.AppendElement(AnyToElement(v))
 	}
 }
 
 // Adds single element to list
-func (l *HtmlPiece) AppendElement(e ElementI) *HtmlPiece {
-	l.list = append(l.list, e)
+func (p *HtmlPiece) AppendElement(e ElementI) *HtmlPiece {
+	p.list = append(p.list, e)
 
-	return l
+	return p
 }
 
 // Adds single element to list
-func (l *HtmlPiece) AppendPiece(another_piece *HtmlPiece) *HtmlPiece {
-	l.list = append(l.list, another_piece.list...)
+func (p *HtmlPiece) AppendPiece(another_piece *HtmlPiece) *HtmlPiece {
+	p.list = append(p.list, another_piece.list...)
 
-	return l
+	return p
 }
 
 // Adds text element to list
-func (l *HtmlPiece) AppendText(text string) *HtmlPiece {
-	l.list = append(l.list, Text(text))
+func (p *HtmlPiece) AppendText(text string) *HtmlPiece {
+	p.list = append(p.list, Text(text))
 
-	return l
+	return p
 }
 
-func (l *HtmlPiece) Textf(format string, a ...any) *HtmlPiece {
-	l.list = append(l.list, Textf(format, a...))
+func (p *HtmlPiece) Textf(format string, a ...any) *HtmlPiece {
+	p.list = append(p.list, Textf(format, a...))
 
-	return l
+	return p
 }
 
 // Elements count
-func (l *HtmlPiece) GetElementsCount() int {
-	return len(l.list)
+func (p *HtmlPiece) GetElementsCount() int {
+	return len(p.list)
 }
 
 // ElementI implementation
-func (l *HtmlPiece) GetTags() TagsList {
+func (p *HtmlPiece) GetTags() TagsList {
 	tag_list := make(TagsList, 0)
 
-	for _, element := range l.list {
+	for _, element := range p.list {
 		tag_list = append(tag_list, element.GetTags()...)
 	}
 
@@ -101,10 +97,10 @@ func (l *HtmlPiece) GetTags() TagsList {
 }
 
 // render everything to string as HTML
-func (l HtmlPiece) String() string {
+func (p HtmlPiece) String() string {
 	var sb strings.Builder
 
-	for _, element := range l.list {
+	for _, element := range p.list {
 		for _, tag := range element.GetTags() {
 			sb.WriteString(tag.String())
 		}
@@ -113,22 +109,49 @@ func (l HtmlPiece) String() string {
 	return sb.String()
 }
 
-//endregion
+//=========== NamedHtmlPieces ================
 
-//region Helper functions
-
-// Helper to convert any value to ElementI
-func AnyToElement(v any) ElementI {
-	if v, ok := v.(ElementI); ok {
-		return v
-	}
-
-	if s, ok := mttools.AnyToStringOk(v); ok {
-		return Text(s)
-	}
-
-	log.Panicf("unsupported type: %s", reflect.ValueOf(v).Type().Name())
-	return nil
+// Set of named html pieces
+type NamedHtmlPieces struct {
+	pieces map[string]*HtmlPiece
 }
 
-//endregion
+func NewNamedHtmlPieces() NamedHtmlPieces {
+	ps := NamedHtmlPieces{
+		pieces: make(map[string]*HtmlPiece, 0),
+	}
+
+	return ps
+}
+
+func (np NamedHtmlPieces) Add(name string, v any) {
+	if _, ok := np.pieces[name]; ok {
+		np.pieces[name].Append(v)
+	} else {
+		np.pieces[name] = Piece(v)
+	}
+}
+
+func (np NamedHtmlPieces) Set(name string, v any) {
+	switch v := v.(type) {
+	case HtmlPiece:
+		np.pieces[name] = &v
+	case *HtmlPiece:
+		np.pieces[name] = v
+	default:
+		np.pieces[name] = Piece(v)
+	}
+}
+
+func (np NamedHtmlPieces) GetOk(name string) (p *HtmlPiece, ok bool) {
+	p, ok = np.pieces[name]
+	return p, ok
+}
+
+func (np NamedHtmlPieces) Get(name string) *HtmlPiece {
+	if p, ok := np.GetOk(name); ok {
+		return p
+	}
+
+	return NewHtmlPiece() //empty piece
+}
