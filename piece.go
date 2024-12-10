@@ -3,6 +3,8 @@ package dhtml
 import (
 	"fmt"
 	"strings"
+
+	"golang.org/x/exp/maps"
 )
 
 // HtmlPiece is set of one or several html elements (or no elements at all). Could be tags, complex elements, text content etc.
@@ -154,4 +156,8 @@ func (np NamedHtmlPieces) Get(name string) *HtmlPiece {
 	}
 
 	return NewHtmlPiece() //empty piece
+}
+
+func (np NamedHtmlPieces) Clear() {
+	maps.Clear(np.pieces)
 }
