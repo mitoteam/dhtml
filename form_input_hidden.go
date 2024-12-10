@@ -4,15 +4,15 @@ import (
 	"github.com/mitoteam/mttools"
 )
 
-type HiddenFormItem struct {
+type FormHiddenElement struct {
 	FormItemBase
 }
 
 // force interfaces implementation
-var _ FormItemI = (*HiddenFormItem)(nil)
+var _ FormItemI = (*FormHiddenElement)(nil)
 
-func NewFormHidden(name string, value any) *HiddenFormItem {
-	fi := &HiddenFormItem{}
+func NewFormHidden(name string, value any) *FormHiddenElement {
+	fi := &FormHiddenElement{}
 	fi.name = name
 	fi.defaultValue = value
 

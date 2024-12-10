@@ -4,17 +4,17 @@ import (
 	"github.com/mitoteam/mttools"
 )
 
-type InputFormItem struct {
+type FormInputElement struct {
 	FormItemExtBase
 	tag        *Tag
 	labelAfter bool // true = render <label> after <input>
 }
 
 // force interfaces implementation
-var _ FormItemExtI = (*InputFormItem)(nil)
+var _ FormItemExtI = (*FormInputElement)(nil)
 
-func NewFormInput(name, inputType string) *InputFormItem {
-	fi := &InputFormItem{
+func NewFormInput(name, inputType string) *FormInputElement {
+	fi := &FormInputElement{
 		tag: NewTag("input").Attribute("type", inputType).Class("form-control"),
 	}
 
@@ -25,42 +25,42 @@ func NewFormInput(name, inputType string) *InputFormItem {
 	return fi
 }
 
-func (fi *InputFormItem) Label(v any) *InputFormItem {
+func (fi *FormInputElement) Label(v any) *FormInputElement {
 	fi.label.Append(v)
 	return fi
 }
 
-func (fi *InputFormItem) Class(v any) *InputFormItem {
+func (fi *FormInputElement) Class(v any) *FormInputElement {
 	fi.tag.Class(v)
 	return fi
 }
 
-func (fi *InputFormItem) WrapperClass(v any) *InputFormItem {
+func (fi *FormInputElement) WrapperClass(v any) *FormInputElement {
 	fi.FormItemBase.WrapperClass(v)
 	return fi
 }
 
-func (fi *InputFormItem) DefaultValue(v any) *InputFormItem {
+func (fi *FormInputElement) DefaultValue(v any) *FormInputElement {
 	fi.defaultValue = v
 	return fi
 }
 
-func (fi *InputFormItem) Placeholder(s string) *InputFormItem {
+func (fi *FormInputElement) Placeholder(s string) *FormInputElement {
 	fi.tag.Attribute("placeholder", s)
 	return fi
 }
 
-func (fi *InputFormItem) LabelAfter(b bool) *InputFormItem {
+func (fi *FormInputElement) LabelAfter(b bool) *FormInputElement {
 	fi.labelAfter = b
 	return fi
 }
 
-func (fi *InputFormItem) Note(v any) *InputFormItem {
+func (fi *FormInputElement) Note(v any) *FormInputElement {
 	fi.note.Append(v)
 	return fi
 }
 
-func (fi *InputFormItem) Render() (out HtmlPiece) {
+func (fi *FormInputElement) Render() (out HtmlPiece) {
 	if !fi.labelAfter {
 		out.Append(fi.renderLabel())
 	}
@@ -85,7 +85,7 @@ func (fi *InputFormItem) Render() (out HtmlPiece) {
 	return out
 }
 
-func (fi *InputFormItem) renderLabel() (out HtmlPiece) {
+func (fi *FormInputElement) renderLabel() (out HtmlPiece) {
 	if !fi.label.IsEmpty() {
 		out.Append(
 			NewTag("label").Attribute("for", fi.GetId()).Class("form-label").Append(fi.label),

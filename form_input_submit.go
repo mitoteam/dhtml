@@ -1,12 +1,12 @@
 package dhtml
 
-type SubmitFormItem struct {
+type FormSubmitElement struct {
 	FormItemExtBase
 	classes Classes
 }
 
 // force interfaces implementation
-var _ FormItemExtI = (*SubmitFormItem)(nil)
+var _ FormItemExtI = (*FormSubmitElement)(nil)
 
 var defaultSubmitButtonClasses Classes
 
@@ -14,8 +14,8 @@ func SetDefaultSubmitButtonClasses(v any) {
 	defaultSubmitButtonClasses = AnyToClasses(v)
 }
 
-func NewFormSubmit() *SubmitFormItem {
-	fi := &SubmitFormItem{}
+func NewFormSubmit() *FormSubmitElement {
+	fi := &FormSubmitElement{}
 	fi.wrapped = true
 	fi.name = "submit"
 	fi.classes = defaultSubmitButtonClasses
@@ -37,12 +37,12 @@ func NewFormSubmit() *SubmitFormItem {
 	return fi
 }
 
-func (fi *SubmitFormItem) Label(v any) *SubmitFormItem {
+func (fi *FormSubmitElement) Label(v any) *FormSubmitElement {
 	fi.label.Append(v)
 	return fi
 }
 
-func (fi *SubmitFormItem) Class(v any) *SubmitFormItem {
+func (fi *FormSubmitElement) Class(v any) *FormSubmitElement {
 	fi.classes.Add(v)
 	return fi
 }
