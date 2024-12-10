@@ -18,8 +18,9 @@ type FormItemBase struct {
 	defaultValue any
 	value        any
 
-	renderF RenderFunc
-	wrapped bool //should be placed in <div class="form-item">
+	renderF        RenderFunc
+	wrapped        bool //should be placed in <div class="form-item">
+	wrapperClasses Classes
 }
 
 func (fi *FormItemBase) GetName() string {
@@ -50,15 +51,19 @@ func (fi *FormItemBase) SetWrapped(b bool) {
 	fi.wrapped = b
 }
 
+func (fi *FormItemBase) WrapperClass(v any) {
+	fi.wrapperClasses.Add(v)
+}
+
 func (fi *FormItemBase) GetTags() TagsList {
 	if fi.renderF == nil {
 		log.Panic("Form item render function not set")
 		return nil
 	} else {
 		if fi.wrapped {
-			return Div().Class("form-item").
-				Append(fi.renderF()).
-				GetTags()
+			fi.wrapperClasses.Add("form-item")
+
+			return Div().Class(fi.wrapperClasses).Append(fi.renderF()).GetTags()
 		} else {
 			p := fi.renderF()
 			return p.GetTags()
