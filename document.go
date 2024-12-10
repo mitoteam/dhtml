@@ -11,7 +11,11 @@ type HtmlDocument struct {
 	body *Tag
 	head *Tag
 
+	//metadata for head
 	stylesheets []string
+	charset     string
+	title       string
+	icon        string
 }
 
 // force interfaces implementation
@@ -19,27 +23,33 @@ var _ fmt.Stringer = (*HtmlDocument)(nil)
 var _ ElementI = (*HtmlDocument)(nil)
 
 func NewHtmlDocument() *HtmlDocument {
-	return &HtmlDocument{}
+	return &HtmlDocument{
+		head:    NewTag("head"),
+		body:    NewTag("body"),
+		charset: "utf-8",
+	}
 }
 
 func (d *HtmlDocument) Body() *Tag {
-	if d.body == nil {
-		d.body = NewTag("body")
-	}
-
 	return d.body
 }
 
 func (d *HtmlDocument) Head() *Tag {
-	if d.head == nil {
-		d.head = NewTag("head")
-	}
-
 	return d.head
 }
 
+func (d *HtmlDocument) Charset(charset string) *HtmlDocument {
+	d.charset = charset
+	return d
+}
+
 func (d *HtmlDocument) Title(title string) *HtmlDocument {
-	d.Head().Append(NewTag("title").Text(title))
+	d.title = title
+	return d
+}
+
+func (d *HtmlDocument) Icon(icon string) *HtmlDocument {
+	d.icon = icon
 	return d
 }
 
@@ -61,13 +71,27 @@ func (d *HtmlDocument) Stylesheet(href string) *HtmlDocument {
 }
 
 func (d *HtmlDocument) GetTags() TagsList {
+	head := d.Head()
+
+	if d.charset != "" {
+		head.Append(NewTag("meta").Attribute("charset", d.charset))
+	}
+
+	if d.title != "" {
+		head.Append(NewTag("title").Text(d.title))
+	}
+
+	if d.icon != "" {
+		head.Append(NewTag("link").Attribute("rel", "icon").Attribute("href", d.icon))
+	}
+
 	root := NewTag("html").
-		Append(d.Head()).
+		Append(head).
 		Append(d.Body())
 
 	return TagsList{root}
 }
 
 func (d *HtmlDocument) String() string {
-	return d.GetTags()[0].String()
+	return "<!DOCTYPE html>\n" + d.GetTags()[0].String()
 }
