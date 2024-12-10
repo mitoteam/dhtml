@@ -160,13 +160,10 @@ func renderForm(fh *FormHandler, w http.ResponseWriter, r *http.Request, args mt
 		fd.args = args
 	}
 
-	form := NewForm()
+	form := NewForm().Append(NewFormHidden("form_build_id", fd.build_id))
 	form.formData = fd
 
 	fh.RenderF(form, fd)
-
-	// form.Append(build_id_hidden.renderF().String()) //DBG
-	form.Append(NewFormHidden("form_build_id", fd.build_id))
 
 	formDataStore[fd.build_id] = fd
 

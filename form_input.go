@@ -15,6 +15,7 @@ var _ FormItemExtI = (*InputFormItem)(nil)
 func NewFormInput(name, inputType string) *InputFormItem {
 	fi := &InputFormItem{inputType: inputType}
 	fi.name = SafeId(name)
+	fi.wrapped = true
 	fi.renderF = fi.Render
 
 	return fi

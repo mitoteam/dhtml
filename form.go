@@ -2,7 +2,7 @@ package dhtml
 
 type FormElement struct {
 	formData *FormData
-	body     HtmlPiece
+	tag      *Tag
 }
 
 // force interfaces implementation
@@ -10,7 +10,14 @@ var _ ElementI = (*FormElement)(nil)
 
 // Html form just to render it
 func NewForm() *FormElement {
-	return &FormElement{}
+	return &FormElement{
+		tag: NewTag("form").Attribute("method", "post"),
+	}
+}
+
+func (f *FormElement) Class(v any) *FormElement {
+	f.tag.Class(v)
+	return f
 }
 
 func (f *FormElement) Append(v any) *FormElement {
@@ -29,7 +36,7 @@ func (f *FormElement) Append(v any) *FormElement {
 	}
 
 	// simple not managed form - just added
-	f.body.Append(v)
+	f.tag.Append(v)
 
 	return f
 }
@@ -39,9 +46,5 @@ func (f *FormElement) GetFormData() *FormData {
 }
 
 func (f *FormElement) GetTags() TagsList {
-	root_tag := NewTag("form").Attribute("method", "post")
-
-	root_tag.Append(f.body)
-
-	return root_tag.GetTags()
+	return f.tag.GetTags()
 }

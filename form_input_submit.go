@@ -16,6 +16,7 @@ func SetDefaultSubmitButtonClasses(v any) {
 
 func NewFormSubmit() *SubmitFormItem {
 	fi := &SubmitFormItem{}
+	fi.wrapped = true
 	fi.name = "submit"
 	fi.classes = defaultSubmitButtonClasses
 
