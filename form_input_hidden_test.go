@@ -8,7 +8,7 @@ import (
 
 func TestHidden(t *testing.T) {
 	e := NewFormHidden("hname", "hvalue")
-	html := "<div class=\"form-item\">\n  <input name=\"hname\" type=\"hidden\" value=\"hvalue\" /></div>"
+	html := "<input name=\"hname\" type=\"hidden\" value=\"hvalue\" />"
 
 	require.Equal(t, html, Piece(e).String())
 }
