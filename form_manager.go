@@ -2,9 +2,6 @@ package dhtml
 
 import (
 	"log"
-	"net/http"
-
-	"github.com/mitoteam/mttools"
 )
 
 var FormManager formManagerT
@@ -81,8 +78,10 @@ func (m *formManagerT) SetRenderErrorsF(f func(fd *FormData) HtmlPiece) *formMan
 	return m
 }
 
-func (m *formManagerT) RenderForm(id string, w http.ResponseWriter, r *http.Request, args mttools.Values) *HtmlPiece {
+func (m *formManagerT) RenderForm(id string, fc FormContext) *HtmlPiece {
 	id = SafeId(id)
 
-	return renderForm(m.GetHandler(id), w, r, args)
+	//log.Printf("DBG formManagerT.RenderForm fc: %+v\n", fc)
+
+	return renderForm(m.GetHandler(id), fc)
 }

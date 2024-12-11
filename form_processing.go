@@ -14,6 +14,43 @@ type FormHandler struct {
 	SubmitF   func(fd *FormData)
 }
 
+// ========= FormContext =========
+
+type FormContext struct {
+	params mttools.Values // copied to form data each time form is rendered (even if it is being rebuild)
+	args   mttools.Values // copied to form data on first build only and stored between builds
+	w      http.ResponseWriter
+	r      *http.Request
+}
+
+func NewFormContext(w http.ResponseWriter, r *http.Request) FormContext {
+	c := FormContext{
+		w: w, r: r,
+		params: mttools.NewValues(),
+		args:   mttools.NewValues(),
+	}
+
+	return c
+}
+
+func (fc *FormContext) SetParam(key string, v any) *FormContext {
+	fc.params.Set(key, v)
+	return fc
+}
+
+func (fc *FormContext) GetParam(key string) any {
+	return fc.params.Get(key)
+}
+
+func (fc *FormContext) SetArg(key string, v any) *FormContext {
+	fc.args.Set(key, v)
+	return fc
+}
+
+func (fc *FormContext) GetArg(key string) any {
+	return fc.args.Get(key)
+}
+
 // ========= FormData =========
 var formDataStore map[string]*FormData
 
@@ -26,6 +63,7 @@ type FormErrorsT map[string][]HtmlPiece
 type FormData struct {
 	build_id string
 	args     mttools.Values
+	params   mttools.Values
 	values   mttools.Values
 	labels   NamedHtmlPieces
 
@@ -38,6 +76,7 @@ func NewFormData() *FormData {
 	return &FormData{
 		build_id:  "fd_" + mttools.RandomString(64),
 		args:      mttools.NewValues(),
+		params:    mttools.NewValues(),
 		values:    mttools.NewValues(),
 		errorList: make(FormErrorsT, 0),
 		labels:    NewNamedHtmlPieces(),
@@ -52,8 +91,17 @@ func (fd *FormData) GetAllArgs() mttools.Values {
 	return fd.args
 }
 
+func (fd *FormData) GetParam(name string) any {
+	return fd.params.Get(name)
+}
+
 func (fd *FormData) GetValue(name string) any {
 	return fd.values.Get(name)
+}
+
+func (fd *FormData) SetValue(name string, v any) *FormData {
+	fd.values.Set(name, v)
+	return fd
 }
 
 func (fd *FormData) IsRebuild() bool {
@@ -88,9 +136,13 @@ func (fd *FormData) SetItemError(form_item_name string, v any) {
 	fd.errorList[form_item_name] = append(fd.errorList[form_item_name], *Piece(v))
 }
 
-func (fd *FormData) SetError(name string, v any) {
+func (fd *FormData) SetError(v any) {
 	//empty item name = common error
 	fd.SetItemError("", v)
+}
+
+func (fd *FormData) HasError() bool {
+	return len(fd.errorList) > 0
 }
 
 func (fd *FormData) GetErrors() FormErrorsT {
@@ -102,17 +154,20 @@ func (fd *FormData) ClearErrors() {
 }
 
 // Process form data, build it and render
-func renderForm(fh *FormHandler, w http.ResponseWriter, r *http.Request, args mttools.Values) *HtmlPiece {
+func renderForm(fh *FormHandler, fc FormContext) *HtmlPiece {
 	var formOut HtmlPiece
 	var fd *FormData
 	var isPost bool //false - form is being built for the first time, true - processing form submit by POST request
 
 	// check if it is being re-build (from POST request)
-	if build_id := r.PostFormValue("form_build_id"); build_id != "" {
+	if build_id := fc.r.PostFormValue("form_build_id"); build_id != "" {
 		if fd, isPost = formDataStore[build_id]; isPost {
-			//hydrate form_data.values from POST data
+			//refresh params from context
+			fd.params.CopyFrom(fc.params)
+
+			//re-hydrate form_data.values from POST data
 			for name := range fd.values.GetNamesIterator() {
-				if postValue, ok := r.PostForm[name]; ok {
+				if postValue, ok := fc.r.PostForm[name]; ok {
 					if len(postValue) == 1 {
 						fd.values.Set(name, postValue[0])
 					} else {
@@ -134,7 +189,7 @@ func renderForm(fh *FormHandler, w http.ResponseWriter, r *http.Request, args mt
 
 		fh.ValidateF(fd)
 
-		if len(fd.errorList) > 0 {
+		if fd.HasError() {
 			formOut.Append(FormManager.renderErrorsF(fd))
 			fd.SetRebuild(true) //and display form again
 		} else {
@@ -146,7 +201,8 @@ func renderForm(fh *FormHandler, w http.ResponseWriter, r *http.Request, args mt
 			delete(formDataStore, fd.build_id)
 
 			if fd.redirectUrl != "" {
-				http.Redirect(w, r, fd.redirectUrl, http.StatusSeeOther)
+				http.Redirect(fc.w, fc.r, fd.redirectUrl, http.StatusSeeOther)
+				//fc.w.
 				return NewHtmlPiece() //empty html
 			}
 
@@ -157,7 +213,8 @@ func renderForm(fh *FormHandler, w http.ResponseWriter, r *http.Request, args mt
 
 	if fd == nil {
 		fd = NewFormData()
-		fd.args = args
+		fd.args.CopyFrom(fc.args)
+		fd.params.CopyFrom(fc.params)
 	}
 
 	form := NewForm().Append(NewFormHidden("form_build_id", fd.build_id))
