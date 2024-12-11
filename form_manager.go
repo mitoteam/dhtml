@@ -78,7 +78,7 @@ func (m *formManagerT) SetRenderErrorsF(f func(fd *FormData) HtmlPiece) *formMan
 	return m
 }
 
-func (m *formManagerT) RenderForm(id string, fc FormContext) *HtmlPiece {
+func (m *formManagerT) RenderForm(id string, fc *FormContext) *HtmlPiece {
 	id = SafeId(id)
 
 	//log.Printf("DBG formManagerT.RenderForm fc: %+v\n", fc)

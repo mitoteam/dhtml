@@ -17,20 +17,21 @@ type FormHandler struct {
 // ========= FormContext =========
 
 type FormContext struct {
-	params mttools.Values // copied to form data each time form is rendered (even if it is being rebuild)
-	args   mttools.Values // copied to form data on first build only and stored between builds
-	w      http.ResponseWriter
-	r      *http.Request
+	params      mttools.Values // copied to form data each time form is rendered (even if it is being rebuild)
+	args        mttools.Values // copied to form data on first build only and stored between builds
+	w           http.ResponseWriter
+	r           *http.Request
+	redirectUrl string // issue an redirect to this URL (FormData redirectUrl has priority)
 }
 
-func NewFormContext(w http.ResponseWriter, r *http.Request) FormContext {
-	c := FormContext{
+func NewFormContext(w http.ResponseWriter, r *http.Request) *FormContext {
+	fc := &FormContext{
 		w: w, r: r,
 		params: mttools.NewValues(),
 		args:   mttools.NewValues(),
 	}
 
-	return c
+	return fc
 }
 
 func (fc *FormContext) SetParam(key string, v any) *FormContext {
@@ -49,6 +50,11 @@ func (fc *FormContext) SetArg(key string, v any) *FormContext {
 
 func (fc *FormContext) GetArg(key string) any {
 	return fc.args.Get(key)
+}
+
+func (fc *FormContext) SetRedirect(url string) *FormContext {
+	fc.redirectUrl = url
+	return fc
 }
 
 // ========= FormData =========
@@ -154,7 +160,7 @@ func (fd *FormData) ClearErrors() {
 }
 
 // Process form data, build it and render
-func renderForm(fh *FormHandler, fc FormContext) *HtmlPiece {
+func renderForm(fh *FormHandler, fc *FormContext) *HtmlPiece {
 	var formOut HtmlPiece
 	var fd *FormData
 	var isPost bool //false - form is being built for the first time, true - processing form submit by POST request
@@ -200,13 +206,20 @@ func renderForm(fh *FormHandler, fc FormContext) *HtmlPiece {
 		if !fd.rebuild {
 			delete(formDataStore, fd.build_id)
 
-			if fd.redirectUrl != "" {
-				http.Redirect(fc.w, fc.r, fd.redirectUrl, http.StatusSeeOther)
+			//check redirect (first from FormData, then from FormContext)
+			var redirectUrl = fd.redirectUrl
+
+			if redirectUrl == "" {
+				redirectUrl = fc.redirectUrl
+			}
+
+			if redirectUrl != "" {
+				http.Redirect(fc.w, fc.r, redirectUrl, http.StatusSeeOther)
 				//fc.w.
 				return NewHtmlPiece() //empty html
 			}
 
-			//we are not rebuilding, should be completely new FormData
+			//we are not rebuilding, not redirecting = new form should be built from scratch
 			fd = nil
 		}
 	}
