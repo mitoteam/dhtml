@@ -58,6 +58,7 @@ func (fc *FormContext) SetRedirect(url string) *FormContext {
 }
 
 // ========= FormData =========
+// TODO: formDataStore records expiration
 var formDataStore map[string]*FormData
 
 func init() {
