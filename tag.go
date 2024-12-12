@@ -83,6 +83,11 @@ func (e *Tag) Attribute(name, value string) *Tag {
 	return e
 }
 
+func (e *Tag) attributeUnsafe(name, unsafeValue string) *Tag {
+	e.attributes[SafeAttributeName(name)] = unsafeValue
+	return e
+}
+
 func (e *Tag) GetAttribute(name string) string {
 	return e.attributes[name]
 }

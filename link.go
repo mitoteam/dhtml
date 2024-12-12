@@ -36,3 +36,32 @@ func (e *LinkElement) Class(v any) *LinkElement {
 func (e *LinkElement) GetTags() TagsList {
 	return e.tag.GetTags()
 }
+
+// =======================================================================
+
+// <a> tag with onclick="return confirm('message');"
+type ConfirmLinkElement struct {
+	LinkElement
+}
+
+// force interfaces implementation
+var _ ElementI = (*ConfirmLinkElement)(nil)
+
+// Html form just to render it
+func NewConfirmLink(href, confirmMessage string) *ConfirmLinkElement {
+	l := &ConfirmLinkElement{
+		LinkElement: *NewLink(href),
+	}
+
+	if confirmMessage == "" {
+		confirmMessage = "Are you sure?"
+	}
+
+	l.tag.attributeUnsafe("onclick", "return confirm(\""+confirmMessage+"\");")
+
+	return l
+}
+
+func (e *ConfirmLinkElement) GetTags() TagsList {
+	return e.tag.GetTags()
+}
