@@ -156,8 +156,6 @@ func (t *Tag) IsInline() bool {
 	return true
 }
 
-//region Renderer
-
 // Renders element with all the children as HTML
 func (t *Tag) String() string {
 	var sb strings.Builder
@@ -262,5 +260,3 @@ func (t *Tag) renderAttributes(sb *strings.Builder) {
 		}
 	}
 }
-
-//endregion

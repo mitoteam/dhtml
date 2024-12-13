@@ -8,17 +8,11 @@ type FormSubmitElement struct {
 // force interfaces implementation
 var _ FormItemExtI = (*FormSubmitElement)(nil)
 
-var defaultSubmitButtonClasses Classes
-
-func SetDefaultSubmitButtonClasses(v any) {
-	defaultSubmitButtonClasses = AnyToClasses(v)
-}
-
 func NewFormSubmit() *FormSubmitElement {
 	fi := &FormSubmitElement{}
 	fi.wrapped = true
 	fi.name = "submit"
-	fi.classes = defaultSubmitButtonClasses
+	fi.classes = settings.DefaultSubmitButtonClasses
 
 	fi.renderF = func() (out HtmlPiece) {
 		if fi.label.IsEmpty() {

@@ -116,7 +116,7 @@ func (p *HtmlPiece) GetTags() TagsList {
 }
 
 // render everything to string as HTML
-func (p HtmlPiece) String() string {
+func (p *HtmlPiece) String() string {
 	var sb strings.Builder
 
 	for _, tag := range p.GetTags() {

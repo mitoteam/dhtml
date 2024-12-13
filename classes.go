@@ -10,7 +10,6 @@ import (
 )
 
 // CSS classes list handling
-
 type Classes struct {
 	list []string
 }

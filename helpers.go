@@ -38,6 +38,7 @@ func Comment(text string) *Tag {
 	}
 }
 
+// Renders title and value
 func RenderValue(title, value any) *Tag {
 	tag := Div()
 

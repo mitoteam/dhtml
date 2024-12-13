@@ -36,7 +36,7 @@ html := dhtml.Tag("html").
   )
 
 //return it as HTML string
-return html.Render()
+return html.String()
 ```
 
 And yes, one more time: **Thank you, Drupal!**

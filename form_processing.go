@@ -197,7 +197,7 @@ func renderForm(fh *FormHandler, fc *FormContext) *HtmlPiece {
 		fh.ValidateF(fd)
 
 		if fd.HasError() {
-			formOut.Append(FormManager.renderErrorsF(fd))
+			formOut.Append(settings.FormErrorsRendererF(fd))
 			fd.SetRebuild(true) //and display form again
 		} else {
 			//there were no errors
