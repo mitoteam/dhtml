@@ -10,7 +10,8 @@ import (
 // HtmlPiece is set of one or several html elements (or no elements at all). Could be tags, complex elements, text content etc.
 // Every HtmlPiece as an element itself (so it can be rendered as HTML).
 type HtmlPiece struct {
-	list []ElementI
+	list    []ElementI
+	tagList TagsList // rendered contents
 }
 
 // force interfaces implementation declaring fake variable
@@ -87,25 +88,29 @@ func (p *HtmlPiece) GetElementsCount() int {
 	return len(p.list)
 }
 
+// remove all cached contents
+func (p *HtmlPiece) Clear() *HtmlPiece {
+	p.tagList = make(TagsList, 0)
+	return p
+}
+
 // ElementI implementation
 func (p *HtmlPiece) GetTags() TagsList {
-	tag_list := make(TagsList, 0)
-
-	for _, element := range p.list {
-		tag_list = append(tag_list, element.GetTags()...)
+	if len(p.tagList) == 0 {
+		for _, element := range p.list {
+			p.tagList = append(p.tagList, element.GetTags()...)
+		}
 	}
 
-	return tag_list
+	return p.tagList
 }
 
 // render everything to string as HTML
 func (p HtmlPiece) String() string {
 	var sb strings.Builder
 
-	for _, element := range p.list {
-		for _, tag := range element.GetTags() {
-			sb.WriteString(tag.String())
-		}
+	for _, tag := range p.GetTags() {
+		sb.WriteString(tag.String())
 	}
 
 	return sb.String()
