@@ -1,5 +1,7 @@
 package dhtml
 
+import "html"
+
 // simple <a> element
 type LinkElement struct {
 	tag *Tag
@@ -57,7 +59,7 @@ func NewConfirmLink(href, confirmMessage string) *ConfirmLinkElement {
 		confirmMessage = "Are you sure?"
 	}
 
-	l.tag.attributeUnsafe("onclick", "return confirm(\""+confirmMessage+"\");")
+	l.tag.AttributeUnsafe("onclick", "return confirm(\""+html.EscapeString(confirmMessage)+"\");")
 
 	return l
 }
