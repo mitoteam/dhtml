@@ -8,6 +8,8 @@ type settingsType struct {
 
 	// function to render errors block if there are any after form validation
 	FormErrorsRendererF func(fd *FormData) (out HtmlPiece)
+
+	EmptyLabelRendererF func(label string, span *Tag)
 }
 
 var settings *settingsType
@@ -40,6 +42,14 @@ func init() {
 
 			out.Append(container)
 			return out
+		},
+
+		EmptyLabelRendererF: func(label string, span *Tag) {
+			if label == "" {
+				label = "empty"
+			}
+
+			span.Append("["+label+"]").Attribute("style", "color: grey;")
 		},
 	}
 }

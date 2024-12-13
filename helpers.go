@@ -2,6 +2,8 @@ package dhtml
 
 import (
 	"fmt"
+
+	"github.com/mitoteam/mttools"
 )
 
 //Some basic type and helper shorthands.
@@ -38,7 +40,13 @@ func Comment(text string) *Tag {
 	}
 }
 
-// Renders title and value
+func EmptyLabel(label string) *Tag {
+	span := Span()
+	settings.EmptyLabelRendererF(label, span)
+	return span
+}
+
+// Renders title and some value
 func RenderValue(title, value any) *Tag {
 	tag := Div()
 
@@ -54,14 +62,21 @@ func RenderValue(title, value any) *Tag {
 	return tag
 }
 
-func RenderValueE(title, value HtmlPiece, emptyLabel string) *Tag {
-	valueP := Piece(value)
+// Renders title and some value. If value is empty, render EmptyLabel instead
+func RenderValueE(title, value any, emptyLabel string) *Tag {
+	var valueP *HtmlPiece
 
-	if valueP.IsEmpty() {
-		valueP.Append("[" + emptyLabel + "]")
+	if mttools.IsEmpty(value) {
+		valueP = Piece(EmptyLabel(emptyLabel))
+	} else {
+		valueP = Piece(value)
+
+		if valueP.IsEmpty() {
+			valueP.Append(EmptyLabel(emptyLabel))
+		}
 	}
 
-	return RenderValue(title, value)
+	return RenderValue(title, valueP)
 }
 
 func Dbg(format string, a ...any) ElementI {
