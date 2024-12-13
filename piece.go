@@ -18,9 +18,19 @@ type HtmlPiece struct {
 var _ ElementI = (*HtmlPiece)(nil)
 var _ fmt.Stringer = (*HtmlPiece)(nil)
 
-// Shorthand helper for NewHtmlPiece() constructor
-func Piece(first_element any) *HtmlPiece {
-	return NewHtmlPiece().AppendElement(AnyToElement(first_element))
+// If firstElement is HtmlPiece, return it.
+// Else create new HtmlPiece and add firstElement to its contents.
+func Piece(firstElement any) *HtmlPiece {
+	switch v := firstElement.(type) {
+	case HtmlPiece:
+		return &v
+
+	case *HtmlPiece:
+		return v
+
+	default:
+		return NewHtmlPiece().AppendElement(AnyToElement(firstElement))
+	}
 }
 
 // Actual Constructor
