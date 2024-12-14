@@ -2,6 +2,7 @@ package dhtml
 
 import (
 	"net/http"
+	"slices"
 
 	"github.com/mitoteam/mttools"
 )
@@ -69,10 +70,13 @@ type FormErrorsT map[string][]HtmlPiece
 
 type FormData struct {
 	build_id string
-	args     mttools.Values
-	params   mttools.Values
-	values   mttools.Values
-	labels   NamedHtmlPieces
+
+	args   mttools.Values
+	params mttools.Values
+	values mttools.Values
+
+	labels       NamedHtmlPieces
+	checkboxList []string // names of all checkboxes //TODO: dirty way..., requires refactoring
 
 	errorList   FormErrorsT //map of error lists by form item name
 	rebuild     bool        // rebuild form with same data again
@@ -174,13 +178,26 @@ func renderForm(fh *FormHandler, fc *FormContext) *HtmlPiece {
 
 			//re-hydrate form_data.values from POST data
 			for name := range fd.values.GetNamesIterator() {
-				if postValue, ok := fc.r.PostForm[name]; ok {
-					if len(postValue) == 1 {
-						fd.values.Set(name, postValue[0])
+				var postValue any = nil
+
+				if postUrlValue, ok := fc.r.PostForm[name]; ok {
+					if len(postUrlValue) == 1 {
+						postValue = postUrlValue[0]
 					} else {
-						fd.values.Set(name, postValue)
+						postValue = postUrlValue
 					}
 				}
+
+				//TODO: checkboxes dirty hack
+				if slices.Contains(fd.checkboxList, name) {
+					if postValue == "on" {
+						postValue = true
+					} else {
+						postValue = false
+					}
+				}
+
+				fd.values.Set(name, postValue)
 			}
 		}
 	}

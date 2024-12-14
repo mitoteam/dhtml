@@ -23,7 +23,7 @@ func (f *FormElement) Class(v any) *FormElement {
 func (f *FormElement) Append(v any) *FormElement {
 	if f.formData != nil { //managed form
 		if e, ok := v.(FormItemI); ok {
-			fd := f.formData
+			fd := f.formData //shorthand pointer
 
 			if value, ok := fd.values.GetOk(e.GetName()); ok {
 				e.SetValue(value)
@@ -32,6 +32,13 @@ func (f *FormElement) Append(v any) *FormElement {
 			}
 
 			fd.labels.Set(e.GetName(), e.GetLabel())
+
+			//TODO: should not be here at all...
+			if e, ok := v.(*FormInputElement); ok {
+				if e.tag.GetAttribute("type") == "checkbox" {
+					fd.checkboxList = append(fd.checkboxList, e.GetName())
+				}
+			}
 		}
 	}
 

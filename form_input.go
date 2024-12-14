@@ -14,15 +14,15 @@ type FormInputElement struct {
 var _ FormItemExtI = (*FormInputElement)(nil)
 
 func NewFormInput(name, inputType string) *FormInputElement {
-	fi := &FormInputElement{
-		tag: NewTag("input").Attribute("type", inputType).Class("form-control"),
+	e := &FormInputElement{
+		tag: NewTag("input").Attribute("type", inputType),
 	}
 
-	fi.name = SafeId(name)
-	fi.wrapped = true
-	fi.renderF = fi.Render
+	e.name = SafeId(name)
+	e.wrapped = true
+	e.renderF = e.renderInput
 
-	return fi
+	return e
 }
 
 func (fi *FormInputElement) Label(v any) *FormInputElement {
@@ -60,36 +60,64 @@ func (fi *FormInputElement) Note(v any) *FormInputElement {
 	return fi
 }
 
-func (fi *FormInputElement) Render() (out HtmlPiece) {
-	if !fi.labelAfter {
-		out.Append(fi.renderLabel())
+func (e *FormInputElement) renderInput() (out HtmlPiece) {
+	if !e.labelAfter {
+		out.Append(e.renderLabel())
 	}
 
-	fi.tag.Id(fi.GetId()).
-		Attribute("name", fi.GetName())
+	e.tag.Id(e.GetId()).Class("form-control").
+		Attribute("name", e.GetName())
 
-	if s := mttools.AnyToString(fi.GetValue()); s != "" {
-		fi.tag.Attribute("value", s)
+	if s := mttools.AnyToString(e.GetValue()); s != "" {
+		e.tag.Attribute("value", s)
 	}
 
-	out.Append(fi.tag)
+	out.Append(e.tag)
 
-	if fi.labelAfter {
-		out.Append(fi.renderLabel())
+	if e.labelAfter {
+		out.Append(e.renderLabel())
 	}
 
-	if !fi.note.IsEmpty() {
-		out.Append(Div().Class("form-text").Append(fi.note))
+	if !e.note.IsEmpty() {
+		out.Append(Div().Class("form-text").Append(e.note))
 	}
 
 	return out
 }
 
-func (fi *FormInputElement) renderLabel() (out HtmlPiece) {
-	if !fi.label.IsEmpty() {
+func (e *FormInputElement) renderLabel() (out HtmlPiece) {
+	if !e.label.IsEmpty() {
 		out.Append(
-			NewTag("label").Attribute("for", fi.GetId()).Class("form-label").Append(fi.label),
+			NewTag("label").Attribute("for", e.GetId()).Class("form-label").Append(e.label),
 		)
+	}
+
+	return out
+}
+
+// ======================== checkbox =========================
+
+func NewFormCheckbox(name string) *FormInputElement {
+	e := NewFormInput(name, "checkbox")
+	e.renderF = e.renderCheckbox
+	return e
+}
+
+func (e *FormInputElement) renderCheckbox() (out HtmlPiece) {
+	e.tag.Id(e.GetId()).
+		Attribute("name", e.GetName()).
+		Attribute("value", "on") // set value implicitly (see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/checkbox#value fo details)
+
+	if !mttools.IsEmpty(e.GetValue()) {
+		e.tag.Attribute("checked", "checked")
+	}
+
+	out.Append(e.tag)
+
+	out.Append(e.renderLabel())
+
+	if !e.note.IsEmpty() {
+		out.Append(Div().Class("form-text").Append(e.note))
 	}
 
 	return out
