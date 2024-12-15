@@ -5,6 +5,8 @@ type TableElement struct {
 	tag    *Tag // <table>
 	header *TableRowElement
 	tbody  *Tag
+
+	emptyLabel string
 }
 
 // force interfaces implementation
@@ -20,6 +22,11 @@ func NewTable() *TableElement {
 
 func (e *TableElement) Class(v any) *TableElement {
 	e.tag.Class(v)
+	return e
+}
+
+func (e *TableElement) EmptyLabel(label string) *TableElement {
+	e.emptyLabel = label
 	return e
 }
 
@@ -44,6 +51,11 @@ func (e *TableElement) NewRow() (row *TableRowElement) {
 }
 
 func (e *TableElement) GetTags() TagsList {
+	//empty label set and no rows added - jsut show label
+	if e.emptyLabel != "" && !e.tbody.HasChildren() {
+		return EmptyLabel(e.emptyLabel).GetTags()
+	}
+
 	if e.header.tag.HasChildren() {
 		e.tag.Append(NewTag("thead").Append(e.header.tag))
 	}
