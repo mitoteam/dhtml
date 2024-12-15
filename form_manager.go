@@ -46,10 +46,15 @@ func (m *formManagerT) GetHandler(id string) *FormHandler {
 	}
 }
 
-func (m *formManagerT) RenderForm(id string, fc *FormContext) *HtmlPiece {
+func (m *formManagerT) RenderForm(handler *FormHandler, fc *FormContext) *HtmlPiece {
+	return renderForm(handler, fc)
+}
+
+func (m *formManagerT) RenderFormById(id string, fc *FormContext) *HtmlPiece {
 	id = SafeId(id)
 
 	//log.Printf("DBG formManagerT.RenderForm fc: %+v\n", fc)
+	handler := m.GetHandler(id)
 
-	return renderForm(m.GetHandler(id), fc)
+	return renderForm(handler, fc)
 }
