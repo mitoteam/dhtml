@@ -44,49 +44,54 @@ func (p *HtmlPiece) IsEmpty() bool {
 	return len(p.list) == 0
 }
 
-// Adds something to list
-func (p *HtmlPiece) Append(v any) *HtmlPiece {
-	if v == nil || v == "" {
-		//nothing to append
-		return p
+// Adds something to the piece: another piece, ElemenetI, any string, Stringer or other value.
+func (p *HtmlPiece) Append(v ...any) *HtmlPiece {
+	for _, v := range v {
+		if v == nil || v == "" {
+			//nothing to append
+			continue
+		}
+
+		switch v := v.(type) {
+		case HtmlPiece:
+			p.AppendPiece(&v)
+
+		case *HtmlPiece:
+			p.AppendPiece(v)
+
+		case ElementI:
+			p.AppendElement(v)
+
+		default:
+			p.AppendElement(AnyToElement(v))
+		}
 	}
 
-	switch v := v.(type) {
-	case HtmlPiece:
-		return p.AppendPiece(&v)
-
-	case *HtmlPiece:
-		return p.AppendPiece(v)
-
-	case ElementI:
-		return p.AppendElement(v)
-
-	default:
-		return p.AppendElement(AnyToElement(v))
-	}
+	return p
 }
 
-// Adds single element to list
+// Adds single element
 func (p *HtmlPiece) AppendElement(e ElementI) *HtmlPiece {
 	p.list = append(p.list, e)
 
 	return p
 }
 
-// Adds single element to list
+// Adds another piece elements to this one
 func (p *HtmlPiece) AppendPiece(another_piece *HtmlPiece) *HtmlPiece {
 	p.list = append(p.list, another_piece.list...)
 
 	return p
 }
 
-// Adds text element to list
+// Adds text element to piece
 func (p *HtmlPiece) AppendText(text string) *HtmlPiece {
 	p.list = append(p.list, Text(text))
 
 	return p
 }
 
+// Format and add text element
 func (p *HtmlPiece) Textf(format string, a ...any) *HtmlPiece {
 	p.list = append(p.list, Textf(format, a...))
 

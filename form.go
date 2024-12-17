@@ -20,30 +20,31 @@ func (f *FormElement) Class(v any) *FormElement {
 	return f
 }
 
-func (f *FormElement) Append(v any) *FormElement {
-	if f.formData != nil { //managed form
-		if e, ok := v.(FormItemI); ok {
-			fd := f.formData //shorthand pointer
+func (f *FormElement) Append(v ...any) *FormElement {
+	for _, v := range v {
+		if f.formData != nil { //managed form
+			if e, ok := v.(FormItemI); ok {
+				fd := f.formData //shorthand pointer
 
-			if value, ok := fd.values.GetOk(e.GetName()); ok {
-				e.SetValue(value)
-			} else {
-				fd.values.Set(e.GetName(), "") //add empty string to data
-			}
+				if value, ok := fd.values.GetOk(e.GetName()); ok {
+					e.SetValue(value)
+				} else {
+					fd.values.Set(e.GetName(), "") //add empty string to data
+				}
 
-			fd.labels.Set(e.GetName(), e.GetLabel())
+				fd.labels.Set(e.GetName(), e.GetLabel())
 
-			//TODO: should not be here at all...
-			if e, ok := v.(*FormInputElement); ok {
-				if e.tag.GetAttribute("type") == "checkbox" {
-					fd.checkboxList = append(fd.checkboxList, e.GetName())
+				//TODO: should not be here at all...
+				if e, ok := v.(*FormInputElement); ok {
+					if e.tag.GetAttribute("type") == "checkbox" {
+						fd.checkboxList = append(fd.checkboxList, e.GetName())
+					}
 				}
 			}
 		}
-	}
 
-	// simple not managed form - just added
-	f.tag.Append(v)
+		f.tag.Append(v)
+	}
 
 	return f
 }

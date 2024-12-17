@@ -62,13 +62,13 @@ func NewTag(tag string) *Tag {
 }
 
 func (t *Tag) GetTags() TagsList {
-	//tag is a list of itself
+	//tag is just a list of itself
 	return TagsList{t}
 }
 
-// Adds child element
-func (t *Tag) Append(v any) *Tag {
-	t.children.Append(v)
+// Adds child element(s)
+func (t *Tag) Append(v ...any) *Tag {
+	t.children.Append(v...)
 	return t
 }
 
