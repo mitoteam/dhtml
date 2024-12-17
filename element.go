@@ -12,7 +12,7 @@ import (
 // It could be much more complex things like Bootstrap's card for example.
 // Whole HTML document is element as well (see dhtml.Document helper).
 type ElementI interface {
-	GetTags() TagsList
+	GetTags() TagList
 }
 
 func AnyToElement(v any) ElementI {

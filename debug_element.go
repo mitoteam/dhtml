@@ -34,7 +34,7 @@ func (e *DebugElement) Textf(format string, a ...any) *DebugElement {
 	return e
 }
 
-func (e *DebugElement) GetTags() TagsList {
+func (e *DebugElement) GetTags() TagList {
 	div := Div().Attribute("style", "border: 1px solid red; padding: 10px; margin 10px;")
 
 	if !e.label.IsEmpty() {
@@ -46,5 +46,5 @@ func (e *DebugElement) GetTags() TagsList {
 
 	div.Append(e.body)
 
-	return TagsList{div}
+	return TagList{div}
 }

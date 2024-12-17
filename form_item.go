@@ -55,7 +55,7 @@ func (fi *FormItemBase) WrapperClass(v any) {
 	fi.wrapperClasses.Add(v)
 }
 
-func (fi *FormItemBase) GetTags() TagsList {
+func (fi *FormItemBase) GetTags() TagList {
 	if fi.renderF == nil {
 		log.Panic("Form item render function not set")
 		return nil

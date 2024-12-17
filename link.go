@@ -34,7 +34,7 @@ func (e *LinkElement) Class(v any) *LinkElement {
 	return e
 }
 
-func (e *LinkElement) GetTags() TagsList {
+func (e *LinkElement) GetTags() TagList {
 	return e.tag.GetTags()
 }
 
@@ -63,6 +63,6 @@ func NewConfirmLink(href, confirmMessage string) *ConfirmLinkElement {
 	return l
 }
 
-func (e *ConfirmLinkElement) GetTags() TagsList {
+func (e *ConfirmLinkElement) GetTags() TagList {
 	return e.tag.GetTags()
 }

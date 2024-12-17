@@ -43,7 +43,7 @@ type (
 		text string //comments and raw text content
 	}
 
-	TagsList []*Tag
+	TagList []*Tag
 )
 
 // force interfaces implementation
@@ -61,9 +61,9 @@ func NewTag(tag string) *Tag {
 	return r
 }
 
-func (t *Tag) GetTags() TagsList {
+func (t *Tag) GetTags() TagList {
 	//tag is just a list of itself
-	return TagsList{t}
+	return TagList{t}
 }
 
 // Adds child element(s)

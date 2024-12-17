@@ -70,7 +70,7 @@ func (d *HtmlDocument) Stylesheet(href string) *HtmlDocument {
 	return d
 }
 
-func (d *HtmlDocument) GetTags() TagsList {
+func (d *HtmlDocument) GetTags() TagList {
 	head := d.Head()
 
 	if d.charset != "" {
@@ -89,7 +89,7 @@ func (d *HtmlDocument) GetTags() TagsList {
 		Append(head).
 		Append(d.Body())
 
-	return TagsList{root}
+	return TagList{root}
 }
 
 func (d *HtmlDocument) String() string {

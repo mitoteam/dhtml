@@ -53,6 +53,6 @@ func (f *FormElement) GetFormData() *FormData {
 	return f.formData
 }
 
-func (f *FormElement) GetTags() TagsList {
+func (f *FormElement) GetTags() TagList {
 	return f.tag.GetTags()
 }

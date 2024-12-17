@@ -50,7 +50,7 @@ func (e *TableElement) NewRow() (row *TableRowElement) {
 	return row
 }
 
-func (e *TableElement) GetTags() TagsList {
+func (e *TableElement) GetTags() TagList {
 	//empty label set and no rows added - jsut show label
 	if e.emptyLabel != "" && !e.tbody.HasChildren() {
 		return EmptyLabel(e.emptyLabel).GetTags()
@@ -96,7 +96,7 @@ func (e *TableRowElement) Class(v any) *TableRowElement {
 	return e
 }
 
-func (e *TableRowElement) GetTags() TagsList {
+func (e *TableRowElement) GetTags() TagList {
 	return e.tag.GetTags()
 }
 
@@ -122,6 +122,6 @@ func (e *TableCellElement) Append(v any) *TableCellElement {
 	return e
 }
 
-func (e *TableCellElement) GetTags() TagsList {
+func (e *TableCellElement) GetTags() TagList {
 	return e.tag.GetTags()
 }

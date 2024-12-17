@@ -11,7 +11,7 @@ import (
 // Every HtmlPiece as an element itself (so it can be rendered as HTML).
 type HtmlPiece struct {
 	list    []ElementI
-	tagList TagsList // rendered contents
+	tagList TagList // rendered contents
 }
 
 // force interfaces implementation declaring fake variable
@@ -105,12 +105,12 @@ func (p *HtmlPiece) GetElementsCount() int {
 
 // remove all cached contents
 func (p *HtmlPiece) Clear() *HtmlPiece {
-	p.tagList = make(TagsList, 0)
+	p.tagList = make(TagList, 0)
 	return p
 }
 
 // ElementI implementation
-func (p *HtmlPiece) GetTags() TagsList {
+func (p *HtmlPiece) GetTags() TagList {
 	if len(p.tagList) == 0 {
 		for _, element := range p.list {
 			p.tagList = append(p.tagList, element.GetTags()...)
