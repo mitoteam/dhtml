@@ -134,6 +134,16 @@ func (e *Tag) HasChildren() bool {
 	return !e.children.IsEmpty()
 }
 
+// Calls f for each child element
+func (t *Tag) Walk(f ElementWalkFunc) {
+	t.children.Walk(f)
+}
+
+// Calls f for each child element with recursion
+func (t *Tag) WalkR(f ElementWalkFunc) {
+	t.children.WalkR(f)
+}
+
 // true if this tag could be rendered inline, false - should be rendered on new line and indented.
 func (t *Tag) IsInline() bool {
 	//content or comments has no children so considered inline

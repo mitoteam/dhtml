@@ -11,7 +11,7 @@ import (
 // Every HtmlPiece as an element itself (so it can be rendered as HTML).
 type HtmlPiece struct {
 	list    []ElementI
-	tagList TagList // rendered contents
+	tagList TagList // cached rendered contents
 }
 
 // force interfaces implementation declaring fake variable
@@ -107,6 +107,35 @@ func (p *HtmlPiece) GetElementsCount() int {
 func (p *HtmlPiece) Clear() *HtmlPiece {
 	p.tagList = make(TagList, 0)
 	return p
+}
+
+// Calls f function for each element.
+func (p *HtmlPiece) Walk(f ElementWalkFunc) {
+	if len(p.tagList) > 0 {
+		// already rendered
+		for _, e := range p.tagList {
+			f(e)
+		}
+	} else {
+		for _, e := range p.list {
+			f(e)
+		}
+	}
+}
+
+// Calls f function for each element with recursion.
+func (p *HtmlPiece) WalkR(f ElementWalkFunc) {
+	p.Walk(func(e ElementI) {
+		f(e)
+
+		//and dive deeper
+		switch v := e.(type) {
+		case *HtmlPiece:
+			v.WalkR(f)
+		case *Tag:
+			v.WalkR(f)
+		}
+	})
 }
 
 // ElementI implementation
