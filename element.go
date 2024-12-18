@@ -15,14 +15,17 @@ type ElementI interface {
 	GetTags() TagList
 }
 
+// Function to be passed to Walk() or WalkR() methods
 type ElementWalkFunc func(e ElementI, args ...any)
 
 func AnyToElement(v any) ElementI {
 	if v, ok := v.(ElementI); ok {
+		//already an element
 		return v
 	}
 
 	if s, ok := mttools.AnyToStringOk(v); ok {
+		//strings are simple text elements
 		return Text(s)
 	}
 

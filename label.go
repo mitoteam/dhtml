@@ -23,8 +23,8 @@ func (e *LabelElement) Append(v ...any) *LabelElement {
 	return e
 }
 
-func (e *LabelElement) Class(v any) *LabelElement {
-	e.tag.Class(v)
+func (e *LabelElement) Class(v ...any) *LabelElement {
+	e.tag.Class(v...)
 	return e
 }
 

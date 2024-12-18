@@ -29,8 +29,10 @@ func (c Classes) GetCount() int {
 	return len(c.list)
 }
 
-func (c *Classes) Add(v any) *Classes {
-	c.list = mttools.UniqueSlice(append(c.list, AnyToClasslist(v)...))
+func (c *Classes) Add(v ...any) *Classes {
+	for _, v := range v {
+		c.list = mttools.UniqueSlice(append(c.list, AnyToClasslist(v)...))
+	}
 	return c
 }
 
@@ -40,16 +42,16 @@ func (c *Classes) Prepend(v any) *Classes {
 }
 
 // Adds class(es) from v if no classes from class_set already added
-func (c *Classes) AddFromSet(v any, class_set []string) *Classes {
+func (c *Classes) AddFromSet(class_set []string, v ...any) *Classes {
 	// if no classes from class_set found in c.list
 	if len(mttools.SlicesIntersection(c.list, class_set)) == 0 {
-		c.Add(v)
+		c.Add(v...)
 	}
 
 	return c
 }
 
-// CSS-classes string "parser"
+// CSS-classes string (or something stringable) "parser"
 func AnyToClasslist(v any) []string {
 	var list []string
 
@@ -78,8 +80,11 @@ func AnyToClasslist(v any) []string {
 	return list
 }
 
-// Helper to create Classes from any value
-func AnyToClasses(v any) (c Classes) {
-	c.Add(AnyToClasslist(v))
+// Helper to create new Classes from any value
+func AnyToClasses(v ...any) (c Classes) {
+	for _, v := range v {
+		c.Add(AnyToClasslist(v))
+	}
+
 	return c
 }

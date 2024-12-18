@@ -29,8 +29,8 @@ func (e *LinkElement) Title(title string) *LinkElement {
 	return e
 }
 
-func (e *LinkElement) Class(v any) *LinkElement {
-	e.tag.Class(v)
+func (e *LinkElement) Class(v ...any) *LinkElement {
+	e.tag.Class(v...)
 	return e
 }
 

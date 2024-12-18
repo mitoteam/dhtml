@@ -20,8 +20,8 @@ func NewTable() *TableElement {
 	}
 }
 
-func (e *TableElement) Class(v any) *TableElement {
-	e.tag.Class(v)
+func (e *TableElement) Class(v ...any) *TableElement {
+	e.tag.Class(v...)
 	return e
 }
 
@@ -91,8 +91,8 @@ func (e *TableRowElement) Cell(v any) *TableRowElement {
 	return e.AppendCell(cell)
 }
 
-func (e *TableRowElement) Class(v any) *TableRowElement {
-	e.tag.Class(v)
+func (e *TableRowElement) Class(v ...any) *TableRowElement {
+	e.tag.Class(v...)
 	return e
 }
 
@@ -112,8 +112,8 @@ func NewTableCell() *TableCellElement {
 	return &TableCellElement{tag: NewTag("td")}
 }
 
-func (e *TableCellElement) Class(v any) *TableCellElement {
-	e.tag.Class(v)
+func (e *TableCellElement) Class(v ...any) *TableCellElement {
+	e.tag.Class(v...)
 	return e
 }
 

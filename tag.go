@@ -100,8 +100,8 @@ func (e *Tag) Title(s string) *Tag {
 }
 
 // Adds one or more CSS classes.
-func (e *Tag) Class(v any) *Tag {
-	e.classes.Add(v)
+func (e *Tag) Class(v ...any) *Tag {
+	e.classes.Add(v...)
 	return e
 }
 

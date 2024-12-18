@@ -15,8 +15,8 @@ func NewForm() *FormElement {
 	}
 }
 
-func (f *FormElement) Class(v any) *FormElement {
-	f.tag.Class(v)
+func (f *FormElement) Class(v ...any) *FormElement {
+	f.tag.Class(v...)
 	return f
 }
 
