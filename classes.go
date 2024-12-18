@@ -17,15 +17,15 @@ type Classes struct {
 // force interface implementation
 var _ fmt.Stringer = (*Classes)(nil)
 
-func (c Classes) GetClassList() []string {
+func (c *Classes) GetClassList() []string {
 	return c.list
 }
 
-func (c Classes) String() string {
+func (c *Classes) String() string {
 	return strings.Join(c.list, " ")
 }
 
-func (c Classes) GetCount() int {
+func (c *Classes) Count() int {
 	return len(c.list)
 }
 

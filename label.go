@@ -28,6 +28,11 @@ func (e *LabelElement) Class(v ...any) *LabelElement {
 	return e
 }
 
+func (e *LabelElement) Styles(v ...any) *LabelElement {
+	e.tag.Styles(v...)
+	return e
+}
+
 func (e *LabelElement) GetTags() TagList {
 	return e.tag.GetTags()
 }

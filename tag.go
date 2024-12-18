@@ -37,6 +37,7 @@ type (
 
 		id      string
 		classes Classes
+		styles  Styles
 
 		children HtmlPiece
 
@@ -56,6 +57,7 @@ func NewTag(tag string) *Tag {
 		tag: SafeTagName(tag),
 
 		attributes: make(map[string]string),
+		styles:     NewStyles(),
 	}
 
 	return r
@@ -107,6 +109,18 @@ func (e *Tag) Class(v ...any) *Tag {
 
 func (e *Tag) GetClasses() *Classes {
 	return &e.classes
+}
+
+// Set one CSS-style property.
+func (e *Tag) Style(property, value string) *Tag {
+	e.styles.Set(property, value)
+	return e
+}
+
+// Set one or more CSS-style properties from string, []string, Stringer etc.
+func (e *Tag) Styles(v ...any) *Tag {
+	e.styles.Add(v...)
+	return e
 }
 
 func (e *Tag) Text(content string) *Tag {
@@ -249,9 +263,15 @@ func (t *Tag) renderAttributes(sb *strings.Builder) {
 	}
 
 	//CSS classes
-	if t.classes.GetCount() > 0 {
+	if t.classes.Count() > 0 {
 		attributes.Set("class", t.classes.String())
 		delete(t.attributes, "class") //prefer e.class over direct attributes
+	}
+
+	//styles
+	if t.styles.Count() > 0 {
+		attributes.Set("style", t.styles.String())
+		delete(t.attributes, "style") //prefer e.class over direct attributes
 	}
 
 	//other attributes in alphabetical order
