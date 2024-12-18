@@ -17,6 +17,12 @@ type Classes struct {
 // force interface implementation
 var _ fmt.Stringer = (*Classes)(nil)
 
+func NewClasses(v ...any) (c Classes) {
+	c.Add(v...)
+
+	return c
+}
+
 func (c *Classes) GetClassList() []string {
 	return c.list
 }
@@ -53,6 +59,10 @@ func (c *Classes) AddFromSet(class_set []string, v ...any) *Classes {
 
 // CSS-classes string (or something stringable) "parser"
 func AnyToClasslist(v any) []string {
+	if classes, ok := v.(Classes); ok {
+		return classes.list
+	}
+
 	var list []string
 
 	s, ok := mttools.AnyToStringOk(v)
@@ -78,13 +88,4 @@ func AnyToClasslist(v any) []string {
 	}
 
 	return list
-}
-
-// Helper to create new Classes from any value
-func AnyToClasses(v ...any) (c Classes) {
-	for _, v := range v {
-		c.Add(AnyToClasslist(v))
-	}
-
-	return c
 }
