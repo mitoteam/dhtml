@@ -15,7 +15,7 @@ type ElementI interface {
 	GetTags() TagList
 }
 
-type ElementWalkFunc func(e ElementI)
+type ElementWalkFunc func(e ElementI, args ...any)
 
 func AnyToElement(v any) ElementI {
 	if v, ok := v.(ElementI); ok {

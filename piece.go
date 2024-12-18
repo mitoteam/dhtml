@@ -110,30 +110,30 @@ func (p *HtmlPiece) Clear() *HtmlPiece {
 }
 
 // Calls f function for each element.
-func (p *HtmlPiece) Walk(f ElementWalkFunc) {
+func (p *HtmlPiece) Walk(f ElementWalkFunc, args ...any) {
 	if len(p.tagList) > 0 {
 		// already rendered
 		for _, e := range p.tagList {
-			f(e)
+			f(e, args...)
 		}
 	} else {
 		for _, e := range p.list {
-			f(e)
+			f(e, args...)
 		}
 	}
 }
 
 // Calls f function for each element with recursion.
-func (p *HtmlPiece) WalkR(f ElementWalkFunc) {
-	p.Walk(func(e ElementI) {
-		f(e)
+func (p *HtmlPiece) WalkR(f ElementWalkFunc, args ...any) {
+	p.Walk(func(e ElementI, args ...any) {
+		f(e, args...)
 
 		//and dive deeper
 		switch v := e.(type) {
 		case *HtmlPiece:
-			v.WalkR(f)
+			v.WalkR(f, args...)
 		case *Tag:
-			v.WalkR(f)
+			v.WalkR(f, args...)
 		}
 	})
 }

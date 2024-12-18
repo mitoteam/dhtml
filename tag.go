@@ -135,13 +135,13 @@ func (e *Tag) HasChildren() bool {
 }
 
 // Calls f for each child element
-func (t *Tag) Walk(f ElementWalkFunc) {
-	t.children.Walk(f)
+func (t *Tag) Walk(f ElementWalkFunc, args ...any) {
+	t.children.Walk(f, args...)
 }
 
 // Calls f for each child element with recursion
-func (t *Tag) WalkR(f ElementWalkFunc) {
-	t.children.WalkR(f)
+func (t *Tag) WalkR(f ElementWalkFunc, args ...any) {
+	t.children.WalkR(f, args...)
 }
 
 // true if this tag could be rendered inline, false - should be rendered on new line and indented.
