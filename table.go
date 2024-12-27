@@ -86,9 +86,10 @@ func (e *TableRowElement) AppendCell(cell *TableCellElement) *TableRowElement {
 }
 
 // Add new <TD> with given content to the row
-func (e *TableRowElement) Cell(v any) *TableRowElement {
+func (e *TableRowElement) Cell(v any) *TableCellElement {
 	cell := NewTableCell().Append(v)
-	return e.AppendCell(cell)
+	e.AppendCell(cell)
+	return cell
 }
 
 func (e *TableRowElement) Class(v ...any) *TableRowElement {
