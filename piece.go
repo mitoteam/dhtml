@@ -138,6 +138,7 @@ func (p *HtmlPiece) WalkR(f ElementWalkFunc, args ...any) {
 
 // ElementI implementation
 func (p *HtmlPiece) GetTags() TagList {
+	//p.tagList - cached tags if it was already rendered
 	if len(p.tagList) == 0 {
 		for _, element := range p.list {
 			p.tagList = append(p.tagList, element.GetTags()...)
@@ -147,12 +148,25 @@ func (p *HtmlPiece) GetTags() TagList {
 	return p.tagList
 }
 
-// render everything to string as HTML
+// Render everything to string as HTML
 func (p *HtmlPiece) String() string {
 	var sb strings.Builder
 
 	for _, tag := range p.GetTags() {
 		sb.WriteString(tag.String())
+	}
+
+	return sb.String()
+}
+
+// Render just text content only
+func (p *HtmlPiece) RawString() string {
+	var sb strings.Builder
+
+	for _, tag := range p.GetTags() {
+		if tag.kind == tagKindText {
+			sb.WriteString(tag.text)
+		}
 	}
 
 	return sb.String()
