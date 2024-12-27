@@ -1,8 +1,6 @@
 package dhtml
 
-import (
-	"runtime"
-)
+import "github.com/mitoteam/mttools"
 
 type (
 	DebugElement struct {
@@ -16,10 +14,7 @@ var _ ElementI = (*DebugElement)(nil)
 
 func NewDebugElement(skip int) *DebugElement {
 	e := &DebugElement{}
-
-	if _, file, line, ok := runtime.Caller(skip); ok {
-		e.label.Textf("%s:%d", file, line)
-	}
+	e.label.AppendText(mttools.CallerSignature(skip))
 
 	return e
 }

@@ -3,7 +3,7 @@ module github.com/mitoteam/dhtml
 go 1.23
 
 require (
-	github.com/mitoteam/mttools v1.0.0
+	github.com/mitoteam/mttools v1.0.2
 	github.com/stretchr/testify v1.10.0
 )
 
