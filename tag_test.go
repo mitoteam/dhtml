@@ -1,13 +1,14 @@
-package dhtml
+package dhtml_test
 
 import (
 	"testing"
 
+	"github.com/mitoteam/dhtml"
 	"github.com/stretchr/testify/require"
 )
 
 func TestDiv(t *testing.T) {
-	div := Div().Id("ay_di").Title("title").
+	div := dhtml.Div().Id("ay_di").Title("title").
 		Class("cls").Class("with space").Class("cls" /* duplicate */, "another-one").
 		Attribute("a", "b c").Attribute("d", "").Text("text")
 	html := "<div id=\"ay_di\" class=\"cls with space another-one\" a=\"b c\" d title=\"title\">text</div>"
@@ -16,7 +17,7 @@ func TestDiv(t *testing.T) {
 }
 
 func TestStyles(t *testing.T) {
-	div := Div().Class("cls").Text("text").
+	div := dhtml.Div().Class("cls").Text("text").
 		Style("border", "1px solid grey").
 		Styles("text-align    :     right;    color: blue;")
 

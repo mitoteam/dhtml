@@ -1,7 +1,6 @@
 package dhtml
 
 import (
-	"log"
 	"reflect"
 
 	"github.com/mitoteam/mttools"
@@ -29,6 +28,6 @@ func AnyToElement(v any) ElementI {
 		return Text(s)
 	}
 
-	log.Panicf("unsupported type: %s", reflect.ValueOf(v).Type().Name())
+	mttools.PanicWithSignatureF("unsupported type: %s", reflect.ValueOf(v).Type().Name())
 	return nil
 }
