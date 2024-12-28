@@ -33,6 +33,13 @@ func Textf(format string, args ...any) *Tag {
 	}
 }
 
+func UnsafeText(text string) *Tag {
+	return &Tag{
+		kind: tagKindUnsafeText,
+		text: text,
+	}
+}
+
 func Comment(text string) *Tag {
 	return &Tag{
 		kind: tagKindComment,

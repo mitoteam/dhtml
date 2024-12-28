@@ -13,8 +13,9 @@ import (
 
 const (
 	tagKindNormal = iota
-	tagKindComment
 	tagKindText
+	tagKindUnsafeText
+	tagKindComment
 )
 
 var (
@@ -140,6 +141,10 @@ func (e *Tag) IsText() bool {
 	return e.kind == tagKindText
 }
 
+func (e *Tag) IsUnsafeText() bool {
+	return e.kind == tagKindUnsafeText
+}
+
 func (e *Tag) IsComment() bool {
 	return e.kind == tagKindComment
 }
@@ -206,6 +211,11 @@ func (t *Tag) renderTag(level int, sb *strings.Builder) {
 
 	if t.IsText() {
 		sb.WriteString(html.EscapeString(t.text))
+		return
+	}
+
+	if t.IsUnsafeText() {
+		sb.WriteString(t.text)
 		return
 	}
 
