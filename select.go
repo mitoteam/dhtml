@@ -3,7 +3,7 @@ package dhtml
 import "github.com/mitoteam/mttools"
 
 type SelectElement struct {
-	classes Classes
+	tag     *Tag
 	options []*OptionElement
 }
 
@@ -11,11 +11,23 @@ type SelectElement struct {
 var _ ElementI = (*SelectElement)(nil)
 
 func NewSelect() *SelectElement {
-	return &SelectElement{}
+	return &SelectElement{
+		tag: NewTag("select"),
+	}
 }
 
 func (c *SelectElement) Class(v any) *SelectElement {
-	c.classes.Add(v)
+	c.tag.Class(v)
+	return c
+}
+
+func (c *SelectElement) Id(id string) *SelectElement {
+	c.tag.Id(id)
+	return c
+}
+
+func (c *SelectElement) Attribute(name, value string) *SelectElement {
+	c.tag.Attribute(name, value)
 	return c
 }
 
@@ -33,13 +45,11 @@ func (c *SelectElement) AppendOption(option *OptionElement) *SelectElement {
 }
 
 func (c *SelectElement) GetTags() TagList {
-	selectTag := NewTag("select").Class(c.classes)
-
 	for _, option := range c.options {
-		selectTag.Append(option)
+		c.tag.Append(option)
 	}
 
-	return selectTag.GetTags()
+	return c.tag.GetTags()
 }
 
 // ==================== OptionElement ===================
