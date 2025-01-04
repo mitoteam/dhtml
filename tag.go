@@ -149,6 +149,10 @@ func (e *Tag) IsComment() bool {
 	return e.kind == tagKindComment
 }
 
+func (e *Tag) ChildrenCount() int {
+	return e.children.Len()
+}
+
 func (e *Tag) HasChildren() bool {
 	return !e.children.IsEmpty()
 }
@@ -171,7 +175,7 @@ func (t *Tag) IsInline() bool {
 	}
 
 	// too many children
-	if t.children.GetElementsCount() > 4 {
+	if t.children.Len() > 4 {
 		return false
 	}
 

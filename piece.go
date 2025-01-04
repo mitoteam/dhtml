@@ -8,8 +8,8 @@ import (
 // HtmlPiece is set of one or several html elements (or no elements at all). Could be tags, complex elements, text content etc.
 // Every HtmlPiece as an element itself (so it can be rendered as HTML).
 type HtmlPiece struct {
-	list    []ElementI
-	tagList TagList // cached rendered contents
+	list    []ElementI // added elements, tags or another pieces
+	tagList TagList    // cached rendered contents
 }
 
 // force interfaces implementation declaring fake variable
@@ -36,10 +36,6 @@ func NewHtmlPiece() *HtmlPiece {
 	return &HtmlPiece{
 		list: make([]ElementI, 0),
 	}
-}
-
-func (p *HtmlPiece) IsEmpty() bool {
-	return len(p.list) == 0
 }
 
 // Adds something to the piece: another piece, ElemenetI, any string, Stringer or other value.
@@ -77,6 +73,11 @@ func (p *HtmlPiece) AppendElement(e ElementI) *HtmlPiece {
 
 // Adds another piece elements to this one
 func (p *HtmlPiece) AppendPiece(another_piece *HtmlPiece) *HtmlPiece {
+	if another_piece.IsEmpty() {
+		//nothing to add
+		return p
+	}
+
 	p.list = append(p.list, another_piece.list...)
 
 	return p
@@ -96,8 +97,13 @@ func (p *HtmlPiece) Textf(format string, a ...any) *HtmlPiece {
 	return p
 }
 
+// Returns true if piece has no anything added to it
+func (p *HtmlPiece) IsEmpty() bool {
+	return p.Len() == 0
+}
+
 // Elements count
-func (p *HtmlPiece) GetElementsCount() int {
+func (p *HtmlPiece) Len() int {
 	return len(p.list)
 }
 
