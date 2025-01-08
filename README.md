@@ -2,7 +2,7 @@
 
 Go html renderer inspired by [Drupal](https://www.drupal.org/)'s renderable arrays concept. Allows to built some elements tree in Go and then render it as html.
 
-NOT READY FOR PRODUCTION YET!
+Ready to try beta version.
 
 Code Example:
 ```go
