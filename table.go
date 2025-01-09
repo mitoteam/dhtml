@@ -47,11 +47,17 @@ func (e *TableElement) AppendRow(row *TableRowElement) *TableElement {
 func (e *TableElement) NewRow() (row *TableRowElement) {
 	row = NewTableRow()
 	e.AppendRow(row)
+
 	return row
 }
 
+// Returns added rows count.
+func (e *TableElement) RowCount() int {
+	return e.tbody.ChildrenCount()
+}
+
 func (e *TableElement) GetTags() TagList {
-	//empty label set and no rows added - jsut show label
+	//empty label set and no rows added - just show label
 	if e.emptyLabel != "" && !e.tbody.HasChildren() {
 		return EmptyLabel(e.emptyLabel).GetTags()
 	}
