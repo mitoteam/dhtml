@@ -61,10 +61,12 @@ func RenderValue(title, value any) *Tag {
 	valueP := Piece(value)
 
 	if !titleP.IsEmpty() {
-		tag.Append(NewTag("strong").Append(titleP)).Append(": ")
+		tag.Append(NewTag("strong").Style("vertical-align", "top").Append(titleP).Append(": "))
 	}
 
-	tag.Append(valueP)
+	if !valueP.IsEmpty() {
+		tag.Append(Div().Style("display", "inline-block").Append(valueP))
+	}
 
 	return tag
 }
