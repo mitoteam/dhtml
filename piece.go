@@ -107,9 +107,11 @@ func (p *HtmlPiece) Len() int {
 	return len(p.list)
 }
 
-// remove all cached contents
+// Remove all contents and cached rendered tags.
 func (p *HtmlPiece) Clear() *HtmlPiece {
-	p.tagList = make(TagList, 0)
+	p.list = make([]ElementI, 0)
+	p.tagList = make(TagList, 0) //clear cache
+
 	return p
 }
 
