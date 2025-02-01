@@ -43,6 +43,12 @@ func (e *TableElement) AppendRow(row *TableRowElement) *TableElement {
 	return e
 }
 
+// Adds class(es) to <tbody> tag
+func (e *TableElement) BodyClass(v ...any) *TableElement {
+	e.tbody.Class(v...)
+	return e
+}
+
 // Creates new row, appends it to table and returns back
 func (e *TableElement) NewRow() (row *TableRowElement) {
 	row = NewTableRow()
