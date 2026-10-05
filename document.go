@@ -38,21 +38,25 @@ func (d *HtmlDocument) Head() *Tag {
 	return d.head
 }
 
+// Sets page charset. Default is "utf-8". If empty string is set, no charset meta tag will be added to the head.
 func (d *HtmlDocument) Charset(charset string) *HtmlDocument {
 	d.charset = charset
 	return d
 }
 
+// Sets page title
 func (d *HtmlDocument) Title(title string) *HtmlDocument {
 	d.title = title
 	return d
 }
 
+// Sets page favicon
 func (d *HtmlDocument) Icon(icon string) *HtmlDocument {
 	d.icon = icon
 	return d
 }
 
+// Adds a stylesheet link to the document head. If the same href is already added, it will not be added again.
 func (d *HtmlDocument) Stylesheet(href string) *HtmlDocument {
 	if d.stylesheets == nil {
 		d.stylesheets = make([]string, 0)
