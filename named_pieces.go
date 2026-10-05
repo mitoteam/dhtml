@@ -18,6 +18,13 @@ func NewNamedHtmlPieces() NamedHtmlPieces {
 	return ps
 }
 
+// Returns true if there is a region with `name`.
+func (np *NamedHtmlPieces) Has(name string) bool {
+	_, ok := np.pieces[name]
+	return ok
+}
+
+// Adds `v` piece to `name` region. If there is no such region, it is created. If the region already exists, `v` is appended to it.
 func (np *NamedHtmlPieces) Add(name string, v any) {
 	if mttools.IsEmpty(v) {
 		return //nothing to add
@@ -30,6 +37,7 @@ func (np *NamedHtmlPieces) Add(name string, v any) {
 	}
 }
 
+// Replaces `name` region with `v` piece. If there is no such region, it is created.
 func (np *NamedHtmlPieces) Set(name string, v any) {
 	switch v := v.(type) {
 	case HtmlPiece:
@@ -60,6 +68,11 @@ func (np *NamedHtmlPieces) IsEmpty(name string) bool {
 	}
 
 	return false
+}
+
+// Deletes `name` region. If there is no such region, nothing happens.
+func (np *NamedHtmlPieces) Delete(name string) {
+	delete(np.pieces, name)
 }
 
 func (np *NamedHtmlPieces) Clear() {
