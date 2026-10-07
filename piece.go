@@ -53,6 +53,9 @@ func (p *HtmlPiece) Append(v ...any) *HtmlPiece {
 		case *HtmlPiece:
 			p.AppendPiece(v)
 
+		case TagList:
+			p.AppendElement(&v)
+
 		case ElementI:
 			p.AppendElement(v)
 

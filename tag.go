@@ -29,24 +29,20 @@ var (
 	}
 )
 
-type (
-	// Basic tag element implementation
-	Tag struct {
-		kind       int // tag kind
-		tag        string
-		attributes map[string]string
+// Basic tag element implementation
+type Tag struct {
+	kind       int // tag kind
+	tag        string
+	attributes map[string]string
 
-		id      string
-		classes Classes
-		styles  Styles
+	id      string
+	classes Classes
+	styles  Styles
 
-		children HtmlPiece
+	children HtmlPiece
 
-		text string //comments and raw text content
-	}
-
-	TagList []*Tag
-)
+	text string //comments and raw text content
+}
 
 // force interfaces implementation
 var _ ElementI = (*Tag)(nil)
@@ -209,7 +205,9 @@ func (t *Tag) renderTag(level int, sb *strings.Builder) {
 	sb.WriteString(indent)
 
 	if t.IsComment() {
-		sb.WriteString("<!--" + html.EscapeString(t.text) + "-->")
+		sb.WriteString("<!--")
+		sb.WriteString(html.EscapeString(t.text))
+		sb.WriteString("-->")
 		return
 	}
 
@@ -224,7 +222,8 @@ func (t *Tag) renderTag(level int, sb *strings.Builder) {
 	}
 
 	//prepare raw HTML output
-	sb.WriteString("<" + t.tag)
+	sb.WriteString("<")
+	sb.WriteString(t.tag)
 
 	t.renderAttributes(sb)
 
@@ -262,7 +261,9 @@ func (t *Tag) renderTag(level int, sb *strings.Builder) {
 			sb.WriteString(indent)
 		}
 
-		sb.WriteString("</" + t.tag + ">")
+		sb.WriteString("</")
+		sb.WriteString(t.tag)
+		sb.WriteString(">")
 	}
 }
 
@@ -297,10 +298,25 @@ func (t *Tag) renderAttributes(sb *strings.Builder) {
 	for name, value := range attributes.Iterator() {
 		value = strings.TrimSpace(value)
 
-		sb.WriteString(" " + strings.TrimSpace(name))
+		sb.WriteString(" ")
+		sb.WriteString(strings.TrimSpace(name))
 
 		if len(value) > 0 {
-			sb.WriteString("=\"" + html.EscapeString(value) + "\"")
+			sb.WriteString("=\"")
+			sb.WriteString(html.EscapeString(value))
+			sb.WriteString("\"")
 		}
 	}
+}
+
+// ========================= TagList =====================================
+
+type TagList []*Tag
+
+// force interfaces implementation
+var _ ElementI = (*TagList)(nil)
+
+func (tl *TagList) GetTags() TagList {
+	//tag list is tag list already
+	return *tl
 }
