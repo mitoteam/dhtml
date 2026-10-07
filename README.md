@@ -2,7 +2,6 @@
 
 [![Reference](https://pkg.go.dev/badge/github.com/mitoteam/dhtml.svg)](https://pkg.go.dev/github.com/mitoteam/dhtml)
 ![GitHub code size](https://img.shields.io/github/languages/code-size/mitoteam/dhtml)
-[![Go Report Card](https://goreportcard.com/badge/github.com/mitoteam/dhtml)](https://goreportcard.com/report/github.com/mitoteam/dhtml)
 ![GitHub](https://img.shields.io/github/license/mitoteam/dhtml)
 
 
