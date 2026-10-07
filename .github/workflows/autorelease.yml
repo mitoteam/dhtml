@@ -1,0 +1,49 @@
+name: AutoRelease
+
+on:
+  push:
+    branches: [main]
+    paths: [VERSION]
+  workflow_dispatch:
+
+jobs:
+  BuildAndRelease:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - name: Set environment variables
+      run: echo "TERM=linux" >> "$GITHUB_ENV"
+
+    - uses: actions/checkout@v7
+
+    - name: Set and show version number
+      run: |
+        VERSION=$(cat VERSION)
+        echo "MT_VERSION=$VERSION" >> "$GITHUB_ENV"
+        echo "Release of v$VERSION" >> $GITHUB_STEP_SUMMARY
+
+    - name: Set up Go
+      uses: actions/setup-go@v7
+      with:
+        go-version: '^1.27'
+        check-latest: true
+
+    - name: Make sure it compiles
+      run: go build
+
+    - name: Make sure tests are not failing
+      run: go test
+
+    - name: Create GitHub Release
+      id: release
+      uses: softprops/action-gh-release@v3
+      with:
+        draft: false
+        tag_name: "v${{ env.MT_VERSION }}"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Version url
+      run: |
+        echo "Version v${{ env.MT_VERSION }} page ${{ steps.release.outputs.url }}" >> $GITHUB_STEP_SUMMARY
