@@ -8,7 +8,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/elliotchance/orderedmap/v2"
+	"github.com/elliotchance/orderedmap/v3"
 )
 
 const (
@@ -295,7 +295,7 @@ func (t *Tag) renderAttributes(sb *strings.Builder) {
 	}
 
 	//render attributes
-	for name, value := range attributes.Iterator() {
+	for name, value := range attributes.AllFromFront() {
 		value = strings.TrimSpace(value)
 
 		sb.WriteString(" ")
