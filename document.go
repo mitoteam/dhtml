@@ -13,6 +13,7 @@ type HtmlDocument struct {
 
 	//metadata for head
 	stylesheets []string
+	scripts     []*ScriptElement
 	charset     string
 	title       string
 	icon        string
@@ -58,10 +59,6 @@ func (d *HtmlDocument) Icon(icon string) *HtmlDocument {
 
 // Adds a stylesheet link to the document head. If the same href is already added, it will not be added again.
 func (d *HtmlDocument) Stylesheet(href string) *HtmlDocument {
-	if d.stylesheets == nil {
-		d.stylesheets = make([]string, 0)
-	}
-
 	if !slices.Contains(d.stylesheets, href) {
 		d.stylesheets = append(d.stylesheets, href)
 
@@ -72,6 +69,15 @@ func (d *HtmlDocument) Stylesheet(href string) *HtmlDocument {
 	}
 
 	return d
+}
+
+// Adds <script> element to <head> with "defer" set.
+func (d *HtmlDocument) Script(src string) *ScriptElement {
+	s := NewScriptElement(src)
+
+	d.scripts = append(d.scripts, s)
+
+	return s
 }
 
 func (d *HtmlDocument) GetTags() TagList {
@@ -87,6 +93,10 @@ func (d *HtmlDocument) GetTags() TagList {
 
 	if d.icon != "" {
 		head.Append(NewTag("link").Attribute("rel", "icon").Attribute("href", d.icon))
+	}
+
+	for _, script := range d.scripts {
+		head.Append(script)
 	}
 
 	root := NewTag("html").
