@@ -1,11 +1,11 @@
 module github.com/mitoteam/dhtml
 
-go 1.23.0
+go 1.26.0
 
 require (
-	github.com/mitoteam/mttools v1.0.3
+	github.com/mitoteam/mttools v1.0.12
 	github.com/stretchr/testify v1.10.0
-	golang.org/x/exp v0.0.0-20250106191152-7588d65b2ba8
+	golang.org/x/exp v0.0.0-20261014143641-f0251eb4aa3e
 )
 
 require github.com/elliotchance/orderedmap/v3 v3.1.1
